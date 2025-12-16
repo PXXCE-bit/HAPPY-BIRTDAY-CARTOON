@@ -333,16 +333,16 @@ display:grid;
 gap:12px;
 }
 #maze{
-width:100%;
-height:auto;
-border-radius:14px;
-border:1px solid rgba(255,255,255,.12);
-background: rgba(0,0,0,.18);
-touch-action:none;
-}
-.mazeHint{
-color:var(--muted);
-font-size:13px;
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.18);
+  touch-action:none;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
 }
 </style>
 </head>
@@ -545,7 +545,7 @@ font-size:13px;
 CONFIG (แก้ตรงนี้จุดเดียว)
 ========================= */
 const CONFIG = {
-cartoonBirthday: "00/00/0000", // ✅ เปลี่ยนเป็นวันเกิดจริงของ Cartoon (DD/MM/YYYY)
+cartoonBirthday: "18/12/2006", // ✅ เปลี่ยนเป็นวันเกิดจริงของ Cartoon (DD/MM/YYYY)
 song1: "pause.mp3",
 song2: "happy-birthday.mp3", // ถ้าเป็น .m4a เปลี่ยนเป็น "happy-birthday.m4a"
 img1: "p1.jpg",
@@ -1096,49 +1096,90 @@ function reachedEnd(p){
 return Math.hypot(p.x-END.x, p.y-END.y) <= END.r + 18;
 }
 
-maze.addEventListener("pointerdown", (e)=>{
-if(step !== 2) return;
-e.preventDefault();
-const p = canvasPointFromEvent(e);
-if(nearStart(p)){
-tracing = true;
-$("mazeErr").textContent = "";
-sfxSuccess();
-}else{
-tracing = false;
-sfxFail();
-$("mazeErr").textContent = "ต้องแตะเริ่มที่วงกลม START ก่อน";
+ /* ===== Maze Input (รองรับ iOS: pointer + touch) ===== */
+function onMazeDown(clientX, clientY){
+  if(step !== 2) return;
+
+  const rect = maze.getBoundingClientRect();
+  const p = {
+    x: (clientX - rect.left) * (maze.width / rect.width),
+    y: (clientY - rect.top) * (maze.height / rect.height)
+  };
+
+  if(nearStart(p)){
+    tracing = true;
+    $("mazeErr").textContent = "";
+    sfxSuccess();
+  }else{
+    tracing = false;
+    sfxFail();
+    $("mazeErr").textContent = "ต้องแตะเริ่มที่วงกลม START ก่อน";
+  }
 }
-});
+
+function onMazeMove(clientX, clientY){
+  if(step !== 2) return;
+  if(!tracing) return;
+
+  const rect = maze.getBoundingClientRect();
+  const p = {
+    x: (clientX - rect.left) * (maze.width / rect.width),
+    y: (clientY - rect.top) * (maze.height / rect.height)
+  };
+
+  if(!insidePath(p.x, p.y)){
+    sfxFail();
+    mazeReset("หลุดออกนอกทาง — เริ่มใหม่");
+    return;
+  }
+
+  if(reachedEnd(p)){
+    tracing = false;
+    sfxSuccess();
+    toast("ผ่านเกมที่ 2 ✅");
+    burstConfetti(200);
+    fireworksBurst(14);
+    setTimeout(()=>goStep(3), 550);
+  }
+}
+
+function onMazeUp(){
+  if(step === 2) tracing = false;
+}
+
+/* --- Pointer events --- */
+maze.addEventListener("pointerdown", (e)=>{
+  if(step !== 2) return;
+  e.preventDefault();
+  onMazeDown(e.clientX, e.clientY);
+}, { passive:false });
 
 maze.addEventListener("pointermove", (e)=>{
-if(step !== 2) return;
-if(!tracing) return;
-e.preventDefault();
+  if(step !== 2) return;
+  e.preventDefault();
+  onMazeMove(e.clientX, e.clientY);
+}, { passive:false });
 
-const p = canvasPointFromEvent(e);
+window.addEventListener("pointerup", onMazeUp, { passive:true });
+window.addEventListener("pointercancel", onMazeUp, { passive:true });
 
-// if outside corridor => reset
-if(!insidePath(p.x,p.y)){
-sfxFail();
-mazeReset("หลุดออกนอกทาง — เริ่มใหม่");
-return;
-}
+/* --- Touch events (สำคัญสำหรับ iPad) --- */
+maze.addEventListener("touchstart", (e)=>{
+  if(step !== 2) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  onMazeDown(t.clientX, t.clientY);
+}, { passive:false });
 
-// reached end
-if(reachedEnd(p)){
-tracing=false;
-sfxSuccess();
-toast("ผ่านเกมที่ 2 ✅");
-burstConfetti(200);
-fireworksBurst(14);
-setTimeout(()=>goStep(3), 550);
-}
-});
+maze.addEventListener("touchmove", (e)=>{
+  if(step !== 2) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  onMazeMove(t.clientX, t.clientY);
+}, { passive:false });
 
-window.addEventListener("pointerup", ()=>{
-if(step===2) tracing=false;
-});
+window.addEventListener("touchend", onMazeUp, { passive:true });
+window.addEventListener("touchcancel", onMazeUp, { passive:true });
 
 $("btnMazeReset").addEventListener("click", ()=>mazeReset(""));
 
