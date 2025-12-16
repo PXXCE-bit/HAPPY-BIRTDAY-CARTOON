@@ -4,135 +4,452 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>🎄 ภารกิจวันเกิด</title>
+
 <style>
 :root{
---bg:#070a18; --fg:#eaf2ff; --muted:#a9b7df; --accent:#66ffcc; --accent2:#86a8ff;
---danger:#ff6b6b; --card: rgba(10,16,40,.62);
+--bg:#070a18;
+--fg:#eaf2ff;
+--muted:#a9b7df;
+--accent:#66ffcc;
+--danger:#ff6b6b;
+--card: rgba(10,16,40,.62);
 --border: rgba(255,255,255,.12);
+--gold: #ffd966;
 }
-*{box-sizing:border-box}
+*{ box-sizing:border-box; }
+
 body{
-  margin: 0;
-  min-height: 100vh;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-
-  background: radial-gradient(1100px 520px at 50% 15%, #1b2a66, #070a18);
-  color: #eaf2ff;
-
-  /* ✅ สำคัญ: แก้ปัญหาเลื่อนบน iPad */
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+margin:0;
+min-height:100vh;
+font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+background: radial-gradient(1100px 520px at 50% 15%, #1b2a66, var(--bg));
+color:var(--fg);
+overflow-y:auto;
+overflow-x:hidden;
+-webkit-overflow-scrolling:touch;
 }
-canvas{position:fixed; inset:0; pointer-events:none;}
-.wrap{width:min(980px,94vw); padding:14px; display:grid; gap:12px; grid-template-columns: 1.1fr .9fr;}
-@media(max-width:980px){ .wrap{grid-template-columns:1fr;} }
+
+canvas{ position:fixed; inset:0; pointer-events:none; }
+#snow{ z-index:0; }
+#confetti{ z-index:1; }
+#fire{ z-index:1; }
+
+.lights{
+position:fixed;
+left:0; right:0; top:0;
+height:44px;
+pointer-events:none;
+z-index:2;
+display:flex;
+gap:10px;
+padding:10px 12px;
+opacity:.95;
+}
+.lights i{
+width:10px; height:18px;
+border-radius:999px;
+background:rgba(255,255,255,.6);
+box-shadow:0 0 14px rgba(255,255,255,.35);
+animation:twinkle 1.2s infinite ease-in-out;
+}
+.lights i:nth-child(3n){ animation-delay:.2s; }
+.lights i:nth-child(4n){ animation-delay:.4s; }
+.lights i:nth-child(5n){ animation-delay:.6s; }
+@keyframes twinkle{
+0%,100%{ opacity:.35; transform:translateY(0); filter:saturate(1); }
+50%{ opacity:1; transform:translateY(1px); filter:saturate(1.8); }
+}
+
+.wrap{
+position:relative;
+z-index:3;
+width:min(980px,94vw);
+margin:70px auto 24px;
+padding:14px;
+display:grid;
+gap:12px;
+grid-template-columns: 1.1fr .9fr;
+}
+@media(max-width:980px){
+.wrap{ grid-template-columns:1fr; margin-top:62px; }
+}
 
 .card{
-background: var(--card);
+background:var(--card);
 border:1px solid var(--border);
 border-radius:18px;
-box-shadow: 0 22px 70px rgba(0,0,0,.5);
+box-shadow:0 22px 70px rgba(0,0,0,.5);
 backdrop-filter: blur(10px);
 padding:18px;
 }
-h1{margin:0 0 6px 0; font-size:20px}
-.sub{margin:0 0 12px 0; color:var(--muted); font-size:13px}
-.row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-.prompt{color:var(--accent)}
-.ok{color:var(--accent)}
-.err{min-height:18px; color:var(--danger); font-size:13px; margin-top:8px;}
-.panel{border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:14px; background: rgba(0,0,0,.20);}
+
+h1{ margin:0 0 6px 0; font-size:20px; }
+.sub{ margin:0 0 12px 0; color:var(--muted); font-size:13px; }
+.row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.panel{
+border:1px solid rgba(255,255,255,.12);
+border-radius:16px;
+padding:14px;
+background:rgba(0,0,0,.20);
+}
+.big{ font-size:26px; line-height:1.2; margin:0; }
+.prompt{ color:var(--accent); }
+.err{ min-height:18px; color:var(--danger); font-size:13px; margin-top:8px; }
 
 input, button{
 border-radius:12px;
 border:1px solid rgba(255,255,255,.15);
-background: rgba(0,0,0,.22);
+background:rgba(0,0,0,.22);
 color:var(--fg);
 padding:12px 12px;
 outline:none;
-font: inherit;
+font:inherit;
 }
-input{flex:1; min-width: 220px;}
+input{ flex:1; min-width:220px; }
 button{
 cursor:pointer;
 background: linear-gradient(135deg, rgba(102,255,204,.22), rgba(134,168,255,.16));
+user-select:none;
+-webkit-user-select:none;
+-webkit-touch-callout:none;
 }
-button:hover{transform: translateY(-1px);}
-button:disabled{opacity:.55; cursor:not-allowed; transform:none;}
+button:hover{ transform: translateY(-1px); }
+button:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
 
-.bar{width:100%; height:10px; border-radius:999px; background: rgba(255,255,255,.10); overflow:hidden; border:1px solid rgba(255,255,255,.12);}
-.fill{height:100%; width:0%; background: linear-gradient(90deg, rgba(102,255,204,.9), rgba(134,168,255,.9));}
+.bar{
+width:100%;
+height:10px;
+border-radius:999px;
+background:rgba(255,255,255,.10);
+overflow:hidden;
+border:1px solid rgba(255,255,255,.12);
+}
+.fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg, rgba(102,255,204,.9), rgba(134,168,255,.9));
+}
 
-.gallery{display:grid; gap:10px;}
+.gallery{ display:grid; gap:10px; }
 .photo{
 width:100%;
-aspect-ratio: 16/10;
+aspect-ratio:16/10;
 border-radius:14px;
 border:1px solid rgba(255,255,255,.12);
-background: rgba(0,0,0,.22);
+background:rgba(0,0,0,.22);
 overflow:hidden;
-display:flex; align-items:center; justify-content:center;
+display:flex;
+align-items:center;
+justify-content:center;
 position:relative;
 }
-.photo img{width:100%; height:100%; object-fit:cover; display:block;}
+.photo img{ width:100%; height:100%; object-fit:cover; display:block; }
 .cap{
-position:absolute; left:10px; bottom:10px;
-padding:6px 10px; border-radius:999px;
-background: rgba(0,0,0,.42);
+position:absolute;
+left:10px;
+bottom:10px;
+padding:6px 10px;
+border-radius:999px;
+background:rgba(0,0,0,.42);
 border:1px solid rgba(255,255,255,.14);
 font-size:12px;
 backdrop-filter: blur(6px);
 }
 
-.hidden{display:none !important;}
-.big{font-size:28px; line-height:1.1; margin:0;}
-.toast{
-position:fixed; left:50%; top:16px; transform:translateX(-50%);
-padding:10px 12px; border-radius:12px;
-background: rgba(0,0,0,.55);
-border:1px solid rgba(255,255,255,.14);
-color:var(--fg); font-size:13px;
-opacity:0; pointer-events:none;
-transition: opacity .25s ease, transform .25s ease;
-}
-.toast.show{opacity:1; transform:translateX(-50%) translateY(4px);}
+.hidden{ display:none !important; }
 
 .letter{
 white-space:pre-wrap;
-line-height:1.8;
+line-height:1.85;
 font-size:14px;
+}
+.cursor{
+display:inline-block;
+width:8px;
+margin-left:2px;
+opacity:.9;
+animation: blink .9s steps(2,start) infinite;
+}
+@keyframes blink{ 50%{ opacity:0; } }
+
+.toast{
+position:fixed;
+left:50%;
+top:52px;
+transform:translateX(-50%);
+padding:10px 12px;
+border-radius:12px;
+background:rgba(0,0,0,.55);
+border:1px solid rgba(255,255,255,.14);
 color:var(--fg);
+font-size:13px;
+opacity:0;
+pointer-events:none;
+transition: opacity .25s ease, transform .25s ease;
+z-index:5;
+text-align:center;
+max-width:min(92vw,520px);
+}
+.toast.show{
+opacity:1;
+transform:translateX(-50%) translateY(4px);
+}
+
+/* ===== Intro envelope ===== */
+.envelope{
+width: min(520px, 92vw);
+margin: 0 auto;
+border-radius: 18px;
+background: rgba(255,255,255,.06);
+border: 1px solid rgba(255,255,255,.14);
+padding: 16px;
+position: relative;
+overflow: hidden;
+}
+.env-top{
+height: 120px;
+border-radius: 14px;
+background:
+linear-gradient(135deg, rgba(255,255,255,.10), rgba(0,0,0,.10));
+border:1px solid rgba(255,255,255,.10);
+position:relative;
+}
+.env-top:before{
+content:"";
+position:absolute;
+inset:-24px -24px auto -24px;
+height: 140px;
+background: linear-gradient(180deg, rgba(255,255,255,.20), transparent);
+transform: skewY(-8deg);
+opacity:.25;
+}
+.env-mid{
+margin-top: 12px;
+padding: 14px;
+border-radius: 14px;
+background: rgba(0,0,0,.22);
+border:1px solid rgba(255,255,255,.12);
+text-align:center;
+}
+
+.fingerWrap{
+display:flex;
+justify-content:center;
+margin-top:12px;
+}
+.finger{
+width:110px;
+height:110px;
+border-radius:999px;
+border:1px solid rgba(255,255,255,.16);
+background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.14), rgba(0,0,0,.20));
+box-shadow: 0 18px 50px rgba(0,0,0,.35);
+display:flex;
+align-items:center;
+justify-content:center;
+position:relative;
+touch-action:none;
+}
+.finger svg{
+width:64px; height:64px;
+opacity:.92;
+filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
+}
+.ring{
+position:absolute;
+inset:8px;
+border-radius:999px;
+border:2px solid rgba(255,255,255,.10);
+}
+.ring::after{
+content:"";
+position:absolute;
+inset:-2px;
+border-radius:999px;
+border:2px solid rgba(102,255,204,.85);
+clip-path: polygon(50% 50%, 50% 0, 50% 0, 50% 50%);
+opacity:0;
+}
+.finger.holding .ring::after{
+opacity:1;
+animation: none;
+}
+.holdText{
+margin-top:10px;
+color:var(--muted);
+font-size:13px;
+}
+
+/* ===== Timing game ===== */
+.timingBox{
+border-radius:14px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.22);
+padding:14px;
+}
+.timingTrack{
+position:relative;
+height: 16px;
+border-radius:999px;
+background: rgba(255,255,255,.10);
+border:1px solid rgba(255,255,255,.12);
+overflow:hidden;
+}
+.timingZone{
+position:absolute;
+top:0; bottom:0;
+left: 42%;
+width: 16%;
+background: linear-gradient(90deg, rgba(255,217,102,.35), rgba(255,217,102,.65));
+border-left: 1px solid rgba(255,255,255,.18);
+border-right: 1px solid rgba(255,255,255,.18);
+}
+.timingPointer{
+position:absolute;
+top:-10px;
+width: 10px;
+height: 36px;
+border-radius: 8px;
+background: rgba(102,255,204,.95);
+box-shadow: 0 12px 25px rgba(102,255,204,.18);
+left:0%;
+transform: translateX(-50%);
+}
+.badge{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:8px 10px;
+border-radius:999px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.22);
+color:var(--muted);
+font-size:12px;
+}
+
+/* ===== Maze canvas ===== */
+.mazeWrap{
+display:grid;
+gap:12px;
+}
+#maze{
+width:100%;
+height:auto;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.18);
+touch-action:none;
+}
+.mazeHint{
+color:var(--muted);
+font-size:13px;
 }
 </style>
 </head>
+
 <body>
+<canvas id="snow"></canvas>
 <canvas id="confetti"></canvas>
 <canvas id="fire"></canvas>
+<div class="lights" id="lights" aria-hidden="true"></div>
 <div class="toast" id="toast"></div>
 
 <div class="wrap">
 <!-- LEFT -->
 <div class="card">
 <h1>🎄 ภารกิจวันเกิด (PEACE → Cartoon)</h1>
-<p class="sub">ทำให้ครบ 3 ภารกิจ แล้วอ่านจดหมาย และปลดล็อกเพลงสุดท้าย</p>
+<p class="sub">เริ่มจากการ “สแกนลายนิ้วมือ” → เล่น 2 เกม → แล้วค่อยเข้าสู่ภารกิจหลัก</p>
 
-<!-- Start gate -->
-<div class="panel" id="gatePanel" style="margin-top:12px">
+<!-- Progress -->
+<div class="panel">
 <div class="row" style="justify-content:space-between;">
-<div class="sub">เริ่มระบบ</div>
-<div class="sub">ขั้นตอน <span id="stepLabel">0</span>/7</div>
+<div class="sub">สถานะ</div>
+<div class="sub">ขั้นตอน <span id="stepLabel">0</span>/9</div>
 </div>
 <div class="bar" style="margin-top:8px"><div class="fill" id="fill"></div></div>
+</div>
 
-<p class="sub" style="margin-top:12px">
+<!-- INTRO: Envelope + fingerprint hold -->
+<div class="panel" id="introPanel" style="margin-top:12px">
+<p class="big">✉️ จดหมายลับ</p>
+<p class="sub">สแกนลายนิ้วมือเพื่อปลดล็อก</p>
+
+<div class="envelope">
+<div class="env-top"></div>
+<div class="env-mid">
+<div class="sub" style="margin:0">
+โปรดสแกนลายนิ้วมือ
+</div>
+
+<div class="fingerWrap">
+<div class="finger" id="finger">
+<div class="ring"></div>
+<!-- fingerprint icon -->
+<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+<path d="M12 3c-4 0-7 3-7 7v3c0 3.314 2.686 6 6 6h1" stroke="rgba(234,242,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M12 6c-2.5 0-4 1.8-4 4v3c0 2.2 1.8 4 4 4" stroke="rgba(234,242,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M12 9c-1.4 0-2 1.1-2 2.5V13c0 1.8 1.2 3 3 3" stroke="rgba(234,242,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M15 10.5V13c0 3 2 5 5 5" stroke="rgba(102,255,204,.9)" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
+</div>
+</div>
+
+<div class="holdText" id="holdText">กดค้างที่ลายนิ้วมือ</div>
+</div>
+</div>
+
+<div class="row" style="margin-top:12px; justify-content:space-between;">
+<button id="btnFxIntro">🎆 เอฟเฟกต์</button>
+<span class="badge">Tip: iPad ต้อง “แตะ” เพื่อให้เสียง/เพลงทำงาน</span>
+</div>
+</div>
+
+<!-- GAME 1: Timing bar -->
+<div class="panel hidden" id="game1Panel" style="margin-top:12px">
+<p class="big">เกมที่ 1: Timing Bar</p>
+<p class="sub">กด “หยุด” ให้แท่งอยู่ใน “โซนสีทอง” ให้สำเร็จ 2 ครั้ง</p>
+
+<div class="timingBox">
+<div class="timingTrack" id="timingTrack">
+<div class="timingZone"></div>
+<div class="timingPointer" id="timingPointer"></div>
+</div>
+<div class="row" style="margin-top:12px; justify-content:space-between;">
+<span class="badge">สำเร็จ: <span id="timingWin">0</span>/2</span>
+<span class="badge">พยายาม: <span id="timingTry">0</span>/3</span>
+</div>
+</div>
+
+<div class="row" style="margin-top:12px">
+<button id="btnTimingStart">เริ่ม</button>
+<button id="btnTimingStop" disabled>หยุด</button>
+<button id="btnTimingReset">รีเซ็ต</button>
+</div>
+<div class="err" id="timingErr"></div>
+</div>
+
+<!-- GAME 2: Maze -->
+<div class="panel hidden" id="game2Panel" style="margin-top:12px">
+<p class="big">เกมที่ 2: ไปให้ถึงหัวใจ</p>
+<p class="sub">แตะจุดเริ่ม (วงกลมซ้าย) แล้วลากนิ้วไปตามทางให้ถึงหัวใจ ❤️</p>
+
+<div class="mazeWrap">
+<canvas id="maze" width="820" height="360"></canvas>
+<div class="mazeHint" id="mazeHint">ห้ามหลุดออกนอกทาง ถ้าหลุดจะเริ่มใหม่อัตโนมัติ</div>
+</div>
+
+<div class="row" style="margin-top:12px">
+<button id="btnMazeReset">เริ่มใหม่</button>
+</div>
+<div class="err" id="mazeErr"></div>
+</div>
+
+<!-- ======= ORIGINAL FLOW (เดิม) ======= -->
+<div class="panel hidden" id="gatePanel" style="margin-top:12px">
+<p class="big">เริ่มภารกิจหลัก</p>
+<p class="sub">
 คำถามเริ่มต้น: <span class="prompt">วัน/เดือน/ปีเกิดของ Cartoon คืออะไร?</span><br>
-(พิมพ์เป็นรูปแบบ <span class="prompt">DD/MM/YYYY</span>)
+(พิมพ์รูปแบบ <span class="prompt">DD/MM/YYYY</span>)
 </p>
 
 <div class="row" style="margin-top:10px">
@@ -143,7 +460,7 @@ color:var(--fg);
 
 <div class="row" style="margin-top:12px; justify-content:space-between;">
 <button id="btnPlay1">▶ เล่น/หยุด เพลงหน้าแรก</button>
-<button id="btnFx">🎆 เอฟเฟกต์</button>
+<button id="btnFxGate">🎆 เอฟเฟกต์</button>
 </div>
 
 <audio id="song1" preload="auto" controls style="width:100%; margin-top:10px;"></audio>
@@ -152,7 +469,6 @@ color:var(--fg);
 </div>
 </div>
 
-<!-- Mission panel -->
 <div class="panel hidden" id="missionPanel" style="margin-top:12px">
 <p class="big" id="missionTitle">ภารกิจ</p>
 <p class="sub" id="missionDesc"></p>
@@ -164,20 +480,18 @@ color:var(--fg);
 <div class="err" id="missionErr"></div>
 
 <div class="row" style="margin-top:12px; justify-content:flex-end;">
-<button id="btnFx2">🎉 โปรย / 🎆 พลุ</button>
+<button id="btnFxMission">🎉 โปรย / 🎆 พลุ</button>
 </div>
 </div>
 
-<!-- Letter panel -->
 <div class="panel hidden" id="letterPanel" style="margin-top:12px">
 <p class="big">📩 จดหมายถึง Cartoon</p>
 <div class="letter" id="letterText"></div>
 <div class="row" style="margin-top:12px; justify-content:flex-end;">
-<button id="btnNextAfterLetter">ถัดไป</button>
+<button id="btnNextAfterLetter" disabled>ถัดไป</button>
 </div>
 </div>
 
-<!-- Color question -->
 <div class="panel hidden" id="colorPanel" style="margin-top:12px">
 <p class="big">คำถามสุดท้าย</p>
 <p class="sub">ในจดหมายมีช่องว่าง “สี…” ให้เติมคำตอบ</p>
@@ -188,7 +502,6 @@ color:var(--fg);
 <div class="err" id="colorErr"></div>
 </div>
 
-<!-- Final panel -->
 <div class="panel hidden" id="finalPanel" style="margin-top:12px">
 <p class="big">🎉 Happy Birthday Cartoon</p>
 <p class="sub">ปลดล็อกสำเร็จทั้งหมด ✅</p>
@@ -221,7 +534,7 @@ color:var(--fg);
 <div class="panel" style="margin-top:12px">
 <div class="sub">
 ไฟล์ที่ต้องมีใน repo (root):<br>
-<span class="prompt">p1.jpg, p2.jpg, p3.jpg, pause.mp3, happy-birthday.(mp3/m4a)</span>
+<span class="prompt">p1.jpg, p2.jpg, p3.jpg, pause.mp3, happy-birthday.mp3 (หรือ .m4a)</span>
 </div>
 </div>
 </div>
@@ -229,15 +542,12 @@ color:var(--fg);
 
 <script>
 /* =========================
-ตั้งค่า
-=========================
-✅ เปลี่ยน “วันเกิด Cartoon” ตรงนี้เป็นค่าจริงที่คุณต้องการให้ตอบ
-ตอนนี้ผมยังใส่เป็น 00/00/0000 ไว้กันหลุด (คุณเปลี่ยนเป็นวันเกิดจริงได้เลย)
-*/
+CONFIG (แก้ตรงนี้จุดเดียว)
+========================= */
 const CONFIG = {
-cartoonBirthday: "18/12/2006", // <<<<<< เปลี่ยนตรงนี้เป็นวันเกิดจริงของ Cartoon (DD/MM/YYYY)
+cartoonBirthday: "00/00/0000", // ✅ เปลี่ยนเป็นวันเกิดจริงของ Cartoon (DD/MM/YYYY)
 song1: "pause.mp3",
-song2: "happy-birthday.mp3", // ถ้าเป็น .m4a ให้เปลี่ยนเป็น "happy-birthday.m4a"
+song2: "happy-birthday.mp3", // ถ้าเป็น .m4a เปลี่ยนเป็น "happy-birthday.m4a"
 img1: "p1.jpg",
 img2: "p2.jpg",
 img3: "p3.jpg",
@@ -246,7 +556,8 @@ img3: "p3.jpg",
 const LETTER = `Happy Birthday ครับอ้วน ขอให้ตั้งแต่วันนี้และตลอดไปเป็นวันที่ดีของเธอ ขอให้มีความสุขมากๆในทุกๆวัน ทนฟังเราพูดไปนานๆ บางทีเราอาจจะทะเลาะกันไม่พอใจกันบ้าง แต่ไม่เป็นไรเพราะเค้าถูกเสมอ หยอกจั้ฟ นั่นแหละมีความสุขมากๆเด้ออ้วน จาก PEACE สุดหล่อ ถึง เธอที่เป็นดอกไม้ที่สวยสดงดงาม สี…`;
 
 /* =========================
-State: 0..7
+State
+steps: 0 intro, 1 game1, 2 game2, 3 gate, 4..9 missions/final
 ========================= */
 let step = 0;
 
@@ -260,32 +571,110 @@ setTimeout(()=>t.classList.remove("show"), 1600);
 const norm = (s)=> (s ?? "").trim();
 const normLower = (s)=> norm(s).toLowerCase();
 
+/* progress */
 function setProgress(){
-const pct = Math.min(100, Math.round((step/7)*100));
+const total = 9;
+const pct = Math.min(100, Math.round((step/total)*100));
 $("stepLabel").textContent = step;
 $("fill").style.width = pct + "%";
 }
 setProgress();
 
 /* =========================
-Effects
+Christmas lights
 ========================= */
+(function buildLights(){
+const el = $("lights");
+if(!el) return;
+el.innerHTML = "";
+const colors = ["#ff4d4d","#66ffcc","#86a8ff","#ffd966","#ff8ad6"];
+const count = Math.min(34, Math.max(18, Math.floor(window.innerWidth/24)));
+for(let i=0;i<count;i++){
+const b = document.createElement("i");
+const c = colors[i % colors.length];
+b.style.background = c;
+b.style.boxShadow = `0 0 16px ${c}55`;
+el.appendChild(b);
+}
+})();
+
+/* =========================
+SFX (WebAudio)
+========================= */
+let audioCtx = null;
+function ensureAudio(){
+if(!audioCtx){
+audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+if(audioCtx.state === "suspended") audioCtx.resume();
+}
+function beep({freq=880, dur=0.10, type="sine", vol=0.05} = {}){
+try{
+ensureAudio();
+const o = audioCtx.createOscillator();
+const g = audioCtx.createGain();
+o.type = type;
+o.frequency.value = freq;
+g.gain.value = vol;
+o.connect(g); g.connect(audioCtx.destination);
+o.start();
+o.stop(audioCtx.currentTime + dur);
+}catch(e){}
+}
+function sfxSuccess(){ beep({freq:988,dur:0.08,vol:0.06}); setTimeout(()=>beep({freq:1319,dur:0.10,vol:0.06}), 90); }
+function sfxFail(){ beep({freq:220,dur:0.12,type:"square",vol:0.03}); }
+
+/* =========================
+Effects: Snow / Confetti / Fireworks
+========================= */
+const c0 = $("snow"), x0 = c0.getContext("2d");
 const c1 = $("confetti"), x1 = c1.getContext("2d");
 const c2 = $("fire"), x2 = c2.getContext("2d");
-let W=0,H=0, parts=[], sparks=[], fireLooping=false;
+let parts=[], sparks=[], fireLooping=false;
 
 function resize(){
-W = c1.width = window.innerWidth;
-H = c1.height = window.innerHeight;
-c2.width = window.innerWidth;
-c2.height = window.innerHeight;
+c0.width = window.innerWidth; c0.height = window.innerHeight;
+c1.width = window.innerWidth; c1.height = window.innerHeight;
+c2.width = window.innerWidth; c2.height = window.innerHeight;
 }
 window.addEventListener("resize", resize);
 resize();
 
+/* snow */
+let flakes=[];
+function initSnow(){
+flakes = Array.from({length: 120}, ()=>({
+x: Math.random()*c0.width,
+y: Math.random()*c0.height,
+r: 0.8 + Math.random()*2.2,
+vy: 0.6 + Math.random()*1.8,
+vx: -0.4 + Math.random()*0.8,
+a: 0.35 + Math.random()*0.45
+}));
+}
+initSnow();
+window.addEventListener("resize", initSnow);
+
+function tickSnow(){
+x0.clearRect(0,0,c0.width,c0.height);
+for(const f of flakes){
+f.x += f.vx; f.y += f.vy;
+if(f.y > c0.height + 10){ f.y = -10; f.x = Math.random()*c0.width; }
+if(f.x < -10) f.x = c0.width + 10;
+if(f.x > c0.width + 10) f.x = -10;
+x0.beginPath();
+x0.arc(f.x,f.y,f.r,0,Math.PI*2);
+x0.fillStyle = `rgba(255,255,255,${f.a})`;
+x0.fill();
+}
+requestAnimationFrame(tickSnow);
+}
+requestAnimationFrame(tickSnow);
+
+/* confetti */
 function makePart(){
 return {
-x: Math.random()*W, y: Math.random()*-H,
+x: Math.random()*c1.width, y: Math.random()*-c1.height,
 r: 3+Math.random()*6,
 vx: -1+Math.random()*2,
 vy: 2+Math.random()*5,
@@ -298,32 +687,35 @@ function startConfetti(){
 parts = Array.from({length: 140}, ()=>makePart());
 requestAnimationFrame(tickConfetti);
 }
-function burstConfetti(n=120){
+function burstConfetti(n=140){
 for(let i=0;i<n;i++){
 const p = makePart();
-p.y = Math.random()*H*0.25;
+p.y = Math.random()*c1.height*0.25;
 p.vy = 4+Math.random()*7;
 parts.push(p);
 }
 parts = parts.slice(-420);
 }
 function tickConfetti(){
-x1.clearRect(0,0,W,H);
+x1.clearRect(0,0,c1.width,c1.height);
 for(const p of parts){
 p.x += p.vx; p.y += p.vy; p.rot += p.vr;
-if(p.y > H+30){ p.y=-30; p.x=Math.random()*W; }
+if(p.y > c1.height+30){ p.y=-30; p.x=Math.random()*c1.width; }
 x1.save();
 x1.translate(p.x,p.y); x1.rotate(p.rot);
 x1.fillStyle = `hsla(${p.hue},90%,65%,.95)`;
-x1.fillRect(-p.r, -p.r, p.r*2, p.r*2);
+x1.fillRect(-p.r,-p.r,p.r*2,p.r*2);
 x1.restore();
 }
 requestAnimationFrame(tickConfetti);
 }
+startConfetti();
+
+/* fireworks */
 function fireworksBurst(count=10){
 for(let i=0;i<count;i++){
-const cx = Math.random()*W*0.9 + W*0.05;
-const cy = Math.random()*H*0.45 + H*0.05;
+const cx = Math.random()*c2.width*0.9 + c2.width*0.05;
+const cy = Math.random()*c2.height*0.45 + c2.height*0.05;
 const hue = Math.random()*360;
 for(let k=0;k<32;k++){
 const a = (Math.PI*2) * (k/32);
@@ -346,7 +738,7 @@ s.x += s.vx; s.y += s.vy;
 s.vy += 0.04;
 s.life -= 1;
 x2.beginPath();
-x2.arc(s.x, s.y, 1.6, 0, Math.PI*2);
+x2.arc(s.x,s.y,1.6,0,Math.PI*2);
 x2.fillStyle = `hsla(${s.hue},95%,70%,${Math.max(0,s.life/60)})`;
 x2.fill();
 }
@@ -354,31 +746,25 @@ sparks = sparks.filter(s=>s.life>0);
 if(sparks.length>0) requestAnimationFrame(tickFire);
 else { fireLooping=false; x2.clearRect(0,0,c2.width,c2.height); }
 }
-startConfetti();
 
 /* =========================
-Audio: กันเพลงซ้อนกัน (ข้อ 1)
+Audio: กันเพลงซ้อนกัน
 ========================= */
 const song1 = $("song1");
 const song2 = $("song2");
 song1.src = CONFIG.song1;
 song2.src = CONFIG.song2;
 
-// ถ้าเพลงหนึ่งเล่น อีกเพลงต้องหยุด
 function stopOther(current){
 const other = (current === song1) ? song2 : song1;
-if(!other.paused){
-other.pause();
+if(!other.paused) other.pause();
 }
-}
-
-// ถ้าผู้ใช้กด play ที่ controls เอง ก็ให้หยุดอีกเพลงด้วย
 song1.addEventListener("play", ()=>stopOther(song1));
 song2.addEventListener("play", ()=>stopOther(song2));
 
 async function togglePlay(audioEl, btnEl, labelPlay, labelPause){
 stopOther(audioEl);
-audioEl.load(); // iOS safe
+audioEl.load();
 try{
 if(audioEl.paused){
 await audioEl.play();
@@ -390,7 +776,6 @@ btnEl.textContent = labelPlay;
 toast("หยุดเพลงแล้ว");
 }
 }catch(e){
-console.log(e);
 alert("เล่นเพลงไม่ได้\n\nเช็กว่าไฟล์เสียงอยู่ใน repo และชื่อไฟล์ตรงเป๊ะ\n- pause.mp3\n- happy-birthday.mp3 หรือ .m4a\n\nบน iPad ต้องกดเล่นเอง 1 ครั้ง");
 }
 }
@@ -398,9 +783,376 @@ alert("เล่นเพลงไม่ได้\n\nเช็กว่าไฟ
 /* =========================
 UI helpers
 ========================= */
-function show(elId){ $(elId).classList.remove("hidden"); }
-function hide(elId){ $(elId).classList.add("hidden"); }
+function show(id){ $(id).classList.remove("hidden"); }
+function hide(id){ $(id).classList.add("hidden"); }
 
+function goStep(newStep){
+step = newStep;
+setProgress();
+
+// hide all main panels
+["introPanel","game1Panel","game2Panel","gatePanel","missionPanel","letterPanel","colorPanel","finalPanel"]
+.forEach(hide);
+
+if(step===0) show("introPanel");
+if(step===1) show("game1Panel");
+if(step===2) show("game2Panel");
+if(step===3) show("gatePanel");
+if(step>=4 && step<=7) show("missionPanel");
+if(step===8) show("letterPanel");
+if(step===9) show("colorPanel");
+if(step===10) show("finalPanel");
+}
+goStep(0);
+
+/* ===== Intro fingerprint hold ===== */
+let holdTimer=null;
+let holdStart=0;
+const HOLD_MS = 1600;
+function setHoldProgress(pct){
+// ใช้ clip-path แบบ wedge
+const ringAfter = $("finger").querySelector(".ring");
+const a = Math.max(0, Math.min(1, pct));
+// สร้าง wedge polygon แบบง่าย (12 steps)
+const steps = 36;
+const pts = ["50% 50%","50% 0%"];
+const angleMax = a * Math.PI*2;
+for(let i=0;i<=steps;i++){
+const ang = (-Math.PI/2) + (angleMax*(i/steps));
+const x = 50 + 50*Math.cos(ang);
+const y = 50 + 50*Math.sin(ang);
+pts.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
+}
+// apply to ::after via inline style trick: set CSS variable
+$("finger").style.setProperty("--wedge", `polygon(${pts.join(",")})`);
+// update pseudo style by injecting once
+}
+(function injectWedgeCSS(){
+const s=document.createElement("style");
+s.textContent = `.ring::after{ clip-path: var(--wedge, polygon(50% 50%, 50% 0, 50% 0, 50% 50%)); }`;
+document.head.appendChild(s);
+})();
+
+function holdStartFn(){
+ensureAudio(); // เพื่อให้ iOS ยอมให้เสียงทำงานตั้งแต่แตะครั้งแรก
+const finger = $("finger");
+finger.classList.add("holding");
+$("holdText").textContent = "กำลังสแกน...";
+holdStart = performance.now();
+setHoldProgress(0);
+
+function tick(){
+const now = performance.now();
+const dt = now - holdStart;
+const pct = dt / HOLD_MS;
+setHoldProgress(pct);
+if(pct >= 1){
+holdEndFn(true);
+return;
+}
+holdTimer = requestAnimationFrame(tick);
+}
+holdTimer = requestAnimationFrame(tick);
+}
+function holdEndFn(success){
+const finger = $("finger");
+finger.classList.remove("holding");
+if(holdTimer){ cancelAnimationFrame(holdTimer); holdTimer=null; }
+setHoldProgress(0);
+
+if(success){
+toast("ปลดล็อกสำเร็จ ✅");
+sfxSuccess();
+burstConfetti(160);
+fireworksBurst(10);
+$("holdText").textContent = "ปลดล็อกแล้ว";
+setTimeout(()=>goStep(1), 450);
+}else{
+$("holdText").textContent = "กดค้างที่ลายนิ้วมือ";
+}
+}
+(function setupHold(){
+const finger = $("finger");
+const down = (e)=>{ e.preventDefault(); if(step!==0) return; holdStartFn(); };
+const up = (e)=>{ e.preventDefault(); if(step!==0) return; holdEndFn(false); };
+finger.addEventListener("pointerdown", down);
+window.addEventListener("pointerup", up);
+window.addEventListener("pointercancel", up);
+})();
+
+$("btnFxIntro").addEventListener("click", ()=>{ burstConfetti(180); fireworksBurst(14); });
+
+/* =========================
+GAME 1: Timing Bar
+========================= */
+let timingRAF=null;
+let timingPos=0.0;
+let timingDir=1;
+let timingRunning=false;
+let timingWin=0;
+let timingTry=0;
+
+function timingUpdateUI(){
+$("timingWin").textContent = String(timingWin);
+$("timingTry").textContent = String(timingTry);
+}
+timingUpdateUI();
+
+function timingStart(){
+$("timingErr").textContent = "";
+if(timingRunning) return;
+timingRunning = true;
+$("btnTimingStart").disabled = true;
+$("btnTimingStop").disabled = false;
+
+const speed = 0.9; // cycles per second-ish
+let last = performance.now();
+function loop(now){
+if(!timingRunning) return;
+const dt = (now-last)/1000;
+last = now;
+
+timingPos += timingDir * dt * speed;
+if(timingPos >= 1){ timingPos=1; timingDir=-1; }
+if(timingPos <= 0){ timingPos=0; timingDir=1; }
+
+$("timingPointer").style.left = (timingPos*100) + "%";
+timingRAF = requestAnimationFrame(loop);
+}
+timingRAF = requestAnimationFrame(loop);
+}
+
+function timingStop(){
+if(!timingRunning) return;
+timingRunning = false;
+if(timingRAF){ cancelAnimationFrame(timingRAF); timingRAF=null; }
+
+$("btnTimingStart").disabled = false;
+$("btnTimingStop").disabled = true;
+
+// zone: left 42%, width 16% => [0.42, 0.58]
+timingTry++;
+const ok = (timingPos >= 0.42 && timingPos <= 0.58);
+
+if(ok){
+timingWin++;
+sfxSuccess();
+toast("โดนโซนทอง ✅");
+burstConfetti(120);
+}else{
+sfxFail();
+toast("พลาด! ลองใหม่");
+}
+timingUpdateUI();
+
+if(timingWin >= 2){
+toast("ผ่านเกมที่ 1 ✅");
+fireworksBurst(12);
+setTimeout(()=>goStep(2), 550);
+return;
+}
+
+if(timingTry >= 3 && timingWin < 2){
+$("timingErr").textContent = "ยังไม่ผ่าน (ต้องสำเร็จ 2 ครั้ง) — กดรีเซ็ตเพื่อเริ่มใหม่";
+}
+}
+
+function timingReset(){
+timingRunning=false;
+if(timingRAF){ cancelAnimationFrame(timingRAF); timingRAF=null; }
+timingPos = 0;
+timingDir = 1;
+timingWin = 0;
+timingTry = 0;
+$("timingPointer").style.left = "0%";
+$("btnTimingStart").disabled = false;
+$("btnTimingStop").disabled = true;
+$("timingErr").textContent = "";
+timingUpdateUI();
+}
+
+$("btnTimingStart").addEventListener("click", timingStart);
+$("btnTimingStop").addEventListener("click", timingStop);
+$("btnTimingReset").addEventListener("click", timingReset);
+
+/* =========================
+GAME 2: Maze (trace path)
+========================= */
+const maze = $("maze");
+const mx = maze.getContext("2d");
+
+// Define a polyline path in canvas coords
+const PATH = [
+{x: 70, y: 180},
+{x: 170, y: 180},
+{x: 170, y: 90},
+{x: 330, y: 90},
+{x: 330, y: 260},
+{x: 520, y: 260},
+{x: 520, y: 120},
+{x: 680, y: 120},
+{x: 680, y: 200},
+{x: 760, y: 200},
+];
+const PATH_WIDTH = 22;
+const START = {x: PATH[0].x, y: PATH[0].y, r: 16};
+const END = {x: PATH[PATH.length-1].x, y: PATH[PATH.length-1].y, r: 18};
+
+let tracing=false;
+
+function distToSegment(px,py, ax,ay, bx,by){
+const vx = bx-ax, vy = by-ay;
+const wx = px-ax, wy = py-ay;
+const c1 = vx*wx + vy*wy;
+if(c1 <= 0) return Math.hypot(px-ax, py-ay);
+const c2 = vx*vx + vy*vy;
+if(c2 <= c1) return Math.hypot(px-bx, py-by);
+const t = c1 / c2;
+const projx = ax + t*vx, projy = ay + t*vy;
+return Math.hypot(px-projx, py-projy);
+}
+
+function insidePath(px,py){
+// within width from any segment
+for(let i=0;i<PATH.length-1;i++){
+const a=PATH[i], b=PATH[i+1];
+const d = distToSegment(px,py,a.x,a.y,b.x,b.y);
+if(d <= PATH_WIDTH) return true;
+}
+return false;
+}
+
+function drawMaze(){
+mx.clearRect(0,0,maze.width,maze.height);
+
+// glow background lines
+mx.lineCap = "round";
+mx.lineJoin = "round";
+
+// corridor (thick)
+mx.beginPath();
+mx.moveTo(PATH[0].x, PATH[0].y);
+for(let i=1;i<PATH.length;i++) mx.lineTo(PATH[i].x, PATH[i].y);
+mx.strokeStyle = "rgba(255,255,255,.10)";
+mx.lineWidth = PATH_WIDTH*2 + 12;
+mx.stroke();
+
+// actual path
+mx.beginPath();
+mx.moveTo(PATH[0].x, PATH[0].y);
+for(let i=1;i<PATH.length;i++) mx.lineTo(PATH[i].x, PATH[i].y);
+mx.strokeStyle = "rgba(102,255,204,.75)";
+mx.lineWidth = PATH_WIDTH*2;
+mx.stroke();
+
+// start circle
+mx.beginPath();
+mx.arc(START.x, START.y, START.r, 0, Math.PI*2);
+mx.fillStyle = "rgba(134,168,255,.35)";
+mx.fill();
+mx.strokeStyle = "rgba(234,242,255,.35)";
+mx.lineWidth = 2;
+mx.stroke();
+mx.fillStyle = "rgba(234,242,255,.9)";
+mx.font = "12px ui-monospace";
+mx.fillText("START", START.x-18, START.y+4);
+
+// end (heart)
+mx.save();
+mx.translate(END.x, END.y);
+mx.fillStyle = "rgba(255,77,77,.9)";
+mx.beginPath();
+mx.moveTo(0, 6);
+mx.bezierCurveTo(0,-10, 22,-10, 22, 6);
+mx.bezierCurveTo(22, 22, 0, 32, 0, 44);
+mx.bezierCurveTo(0, 32, -22, 22, -22, 6);
+mx.bezierCurveTo(-22,-10, 0,-10, 0, 6);
+mx.closePath();
+mx.scale(0.45,0.45);
+mx.fill();
+mx.restore();
+mx.fillStyle = "rgba(255,217,102,.9)";
+mx.font = "12px ui-monospace";
+mx.fillText("❤️", END.x-6, END.y+5);
+}
+
+function mazeReset(msg){
+tracing=false;
+$("mazeErr").textContent = msg || "";
+drawMaze();
+}
+
+function canvasPointFromEvent(e){
+const rect = maze.getBoundingClientRect();
+const cx = (e.clientX - rect.left) * (maze.width / rect.width);
+const cy = (e.clientY - rect.top) * (maze.height / rect.height);
+return {x:cx,y:cy};
+}
+
+function nearStart(p){
+return Math.hypot(p.x-START.x, p.y-START.y) <= START.r + 10;
+}
+function reachedEnd(p){
+return Math.hypot(p.x-END.x, p.y-END.y) <= END.r + 18;
+}
+
+maze.addEventListener("pointerdown", (e)=>{
+if(step !== 2) return;
+e.preventDefault();
+const p = canvasPointFromEvent(e);
+if(nearStart(p)){
+tracing = true;
+$("mazeErr").textContent = "";
+sfxSuccess();
+}else{
+tracing = false;
+sfxFail();
+$("mazeErr").textContent = "ต้องแตะเริ่มที่วงกลม START ก่อน";
+}
+});
+
+maze.addEventListener("pointermove", (e)=>{
+if(step !== 2) return;
+if(!tracing) return;
+e.preventDefault();
+
+const p = canvasPointFromEvent(e);
+
+// if outside corridor => reset
+if(!insidePath(p.x,p.y)){
+sfxFail();
+mazeReset("หลุดออกนอกทาง — เริ่มใหม่");
+return;
+}
+
+// reached end
+if(reachedEnd(p)){
+tracing=false;
+sfxSuccess();
+toast("ผ่านเกมที่ 2 ✅");
+burstConfetti(200);
+fireworksBurst(14);
+setTimeout(()=>goStep(3), 550);
+}
+});
+
+window.addEventListener("pointerup", ()=>{
+if(step===2) tracing=false;
+});
+
+$("btnMazeReset").addEventListener("click", ()=>mazeReset(""));
+
+/* draw when entering game2 */
+const origGoStep = goStep;
+goStep = function(newStep){
+origGoStep(newStep);
+if(newStep===2) mazeReset("");
+};
+goStep(0);
+
+/* =========================
+ORIGINAL FLOW (เดิม)
+========================= */
 function setMission(title, desc, placeholder){
 $("missionTitle").textContent = title;
 $("missionDesc").textContent = desc;
@@ -418,190 +1170,202 @@ cap.className = "cap";
 cap.textContent = capText;
 return {img, cap};
 };
-
-if(which === 1){
-const box = $("imgBox1");
-box.innerHTML = "";
-const {img, cap} = mk(CONFIG.img1, "✅ รูปที่ 1 ปลดล็อกแล้ว");
+if(which===1){
+const box=$("imgBox1"); box.innerHTML="";
+const {img,cap}=mk(CONFIG.img1,"✅ รูปที่ 1 ปลดล็อกแล้ว");
 box.appendChild(img); box.appendChild(cap);
 }
-if(which === 2){
-const box = $("imgBox2");
-box.innerHTML = "";
-const {img, cap} = mk(CONFIG.img2, "✅ รูปที่ 2 ปลดล็อกแล้ว");
+if(which===2){
+const box=$("imgBox2"); box.innerHTML="";
+const {img,cap}=mk(CONFIG.img2,"✅ รูปที่ 2 ปลดล็อกแล้ว");
 box.appendChild(img); box.appendChild(cap);
 }
-if(which === 3){
-const box = $("imgBox3");
-box.innerHTML = "";
-const {img, cap} = mk(CONFIG.img3, "✅ รูปที่ 3 ปลดล็อกแล้ว");
+if(which===3){
+const box=$("imgBox3"); box.innerHTML="";
+const {img,cap}=mk(CONFIG.img3,"✅ รูปที่ 3 ปลดล็อกแล้ว");
 box.appendChild(img); box.appendChild(cap);
 }
 }
 
-/* =========================
-Flow
-========================= */
-function goStep(newStep){
-step = newStep;
-setProgress();
+/* typewriter */
+let typingTimer=null;
+function typeLetter(text){
+const box=$("letterText");
+const btn=$("btnNextAfterLetter");
+if(typingTimer) clearInterval(typingTimer);
 
-if(step === 0){
-show("gatePanel"); hide("missionPanel"); hide("letterPanel"); hide("colorPanel"); hide("finalPanel");
+btn.disabled = true;
+box.innerHTML = "";
+
+const cursor=document.createElement("span");
+cursor.className="cursor";
+cursor.textContent="▍";
+box.appendChild(cursor);
+
+let i=0;
+typingTimer = setInterval(()=>{
+if(i >= text.length){
+clearInterval(typingTimer);
+typingTimer=null;
+cursor.remove();
+btn.disabled = false;
+return;
 }
-if(step >= 1 && step <= 4){
-hide("gatePanel"); show("missionPanel"); hide("letterPanel"); hide("colorPanel"); hide("finalPanel");
-}
-if(step === 5){
-hide("missionPanel"); show("letterPanel"); hide("colorPanel"); hide("finalPanel");
-}
-if(step === 6){
-hide("letterPanel"); show("colorPanel"); hide("finalPanel");
-}
-if(step === 7){
-hide("colorPanel"); show("finalPanel");
+cursor.insertAdjacentText("beforebegin", text[i]);
+i++;
+}, 22);
 }
 
-if(step === 1){
+/* effects buttons */
+$("btnFxGate").addEventListener("click", ()=>{ burstConfetti(180); fireworksBurst(14); });
+$("btnFxMission").addEventListener("click", ()=>{ burstConfetti(200); fireworksBurst(12); });
+
+/* audio buttons */
+$("btnPlay1").addEventListener("click", ()=> togglePlay(song1, $("btnPlay1"), "▶ เล่น/หยุด เพลงหน้าแรก", "⏸ หยุดเพลงหน้าแรก"));
+$("btnPlay2").addEventListener("click", ()=> togglePlay(song2, $("btnPlay2"), "▶ เล่น/หยุด เพลงสุดท้าย", "⏸ หยุดเพลงสุดท้าย"));
+
+/* gate start */
+$("btnStart").addEventListener("click", ()=>{
+const v = norm($("startPw").value);
+$("startErr").textContent = "";
+
+if(v !== CONFIG.cartoonBirthday){
+$("startErr").textContent = "คำตอบไม่ถูกต้อง";
+sfxFail();
+return;
+}
+
+toast("เริ่มภารกิจแล้ว ✅");
+sfxSuccess();
+burstConfetti(160);
+fireworksBurst(10);
+
+// jump to mission step 4
+step = 4; setProgress();
+hide("gatePanel"); show("missionPanel");
 setMission(
 "ภารกิจที่ 1",
 "คำถาม: วันเกิดของ PEACE คือวันไหน?",
 "พิมพ์เป็นรูปแบบ DD/MM/YYYY"
 );
-}
-if(step === 2){
-setMission(
-"ภารกิจที่ 2",
-"ให้ส่งรูป Cartoon ชู 2 นิ้วมาใน LINE ให้ PEACE แล้วรอรับรหัสจากใน LINE (พิมพ์รหัสที่ได้)",
-"พิมพ์รหัสที่ได้รับ..."
-);
-}
-if(step === 3){
-setMission(
-"ภารกิจที่ 3",
-"ให้โอนเงินให้ PEACE 10 บาท แล้วรอรับรหัสใน IG (พิมพ์รหัสที่ได้)",
-"พิมพ์รหัสที่ได้รับ..."
-);
-}
-if(step === 4){
-setMission(
-"ภารกิจเสร็จสิ้น ✅",
-"พร้อมอ่านจดหมายไหม? ถ้าพร้อม พิมพ์คำว่า “พร้อม”",
-"พิมพ์: พร้อม"
-);
-}
-if(step === 5){
-$("letterText").textContent = LETTER;
-}
-}
-
-goStep(0);
-
-/* =========================
-Start: เปลี่ยนเป็นวันเกิด Cartoon (ข้อ 2)
-========================= */
-$("btnStart").addEventListener("click", ()=>{
-const v = norm($("startPw").value);
-$("startErr").textContent = "";
-if(v !== CONFIG.cartoonBirthday){
-$("startErr").textContent = "คำตอบยังไม่ถูกต้อง";
-return;
-}
-toast("เริ่มภารกิจแล้ว ✅");
-burstConfetti(140);
-fireworksBurst(10);
-goStep(1);
 });
+
 $("startPw").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("btnStart").click(); });
 
-$("btnPlay1").addEventListener("click", ()=> togglePlay(song1, $("btnPlay1"), "▶ เล่น/หยุด เพลงหน้าแรก", "⏸ หยุดเพลงหน้าแรก"));
-$("btnPlay2").addEventListener("click", ()=> togglePlay(song2, $("btnPlay2"), "▶ เล่น/หยุด เพลงสุดท้าย", "⏸ หยุดเพลงสุดท้าย"));
-
-$("btnFx").addEventListener("click", ()=>{ burstConfetti(180); fireworksBurst(14); });
-$("btnFx2").addEventListener("click", ()=>{ burstConfetti(180); fireworksBurst(12); });
-
-/* =========================
-Mission submit (ข้อ 3: ไม่มี hint/ไม่มีตัวอย่างเฉลย)
-========================= */
+/* mission submit */
 $("btnSubmit").addEventListener("click", ()=>{
 const ansRaw = norm($("missionInput").value);
 const ansLower = normLower(ansRaw);
 $("missionErr").textContent = "";
 
-if(step === 1){
-// คำตอบจริง: 04/05/2007 (ตามที่คุณกำหนด)
+if(step===4){
 if(ansRaw !== "04/05/2007"){
 $("missionErr").textContent = "คำตอบไม่ถูกต้อง";
+sfxFail();
 return;
 }
 revealImage(1);
 toast("ปลดล็อกรูปที่ 1 ✅");
-burstConfetti(140);
-goStep(2);
+sfxSuccess();
+burstConfetti(160);
+step = 5; setProgress();
+setMission(
+"ภารกิจที่ 2",
+"ให้ส่งรูป Cartoon ชู 2 นิ้วมาใน LINE ให้ PEACE แล้วรอรับรหัสจากใน LINE (พิมพ์รหัสที่ได้)",
+"พิมพ์รหัสที่ได้รับ..."
+);
 return;
 }
 
-if(step === 2){
-if(ansRaw !== "PEACE SUD LOR" && ansLower !== "peace sud lor"){
+if(step===5){
+if(ansRaw !== "Narak Mak" && ansLower !== "narak mak"){
 $("missionErr").textContent = "รหัสไม่ถูกต้อง";
+sfxFail();
 return;
 }
 revealImage(2);
 toast("ปลดล็อกรูปที่ 2 ✅");
+sfxSuccess();
 fireworksBurst(12);
-goStep(3);
+step = 6; setProgress();
+setMission(
+"ภารกิจที่ 3",
+"ให้โอนเงินให้ PEACE 10 บาท แล้วรอรับรหัสใน IG (พิมพ์รหัสที่ได้)",
+"พิมพ์รหัสที่ได้รับ..."
+);
 return;
 }
 
-if(step === 3){
-if(ansRaw !== "ง้วยยยยยย" && ansLower !== "ง้วยยยยยย"){
+if(step===6){
+if(ansRaw !== "Thank you" && ansLower !== "thank you"){
 $("missionErr").textContent = "รหัสไม่ถูกต้อง";
+sfxFail();
 return;
 }
 revealImage(3);
 toast("ปลดล็อกรูปที่ 3 ✅");
-burstConfetti(200);
+sfxSuccess();
+burstConfetti(220);
 fireworksBurst(18);
-goStep(4);
+step = 7; setProgress();
+setMission(
+"ภารกิจเสร็จสิ้น ✅",
+"พร้อมอ่านจดหมายไหม? ถ้าพร้อม พิมพ์คำว่า “พร้อม”",
+"พิมพ์: พร้อม"
+);
 return;
 }
 
-if(step === 4){
+if(step===7){
 if(ansRaw !== "พร้อม"){
 $("missionErr").textContent = "คำตอบไม่ถูกต้อง";
+sfxFail();
 return;
 }
 toast("เปิดจดหมายแล้ว 📩");
-goStep(5);
+sfxSuccess();
+hide("missionPanel");
+step = 8; setProgress();
+show("letterPanel");
+typeLetter(LETTER);
 return;
 }
 });
+
 $("missionInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("btnSubmit").click(); });
 
-/* =========================
-Letter next
-========================= */
+/* letter next */
 $("btnNextAfterLetter").addEventListener("click", ()=>{
-goStep(6);
+hide("letterPanel");
+step = 9; setProgress();
+show("colorPanel");
 });
 
-/* =========================
-Color question
-========================= */
+/* color */
 $("btnColor").addEventListener("click", ()=>{
 const v = norm($("colorInput").value);
 $("colorErr").textContent = "";
 if(v !== "ทอง"){
 $("colorErr").textContent = "คำตอบไม่ถูกต้อง";
+sfxFail();
 return;
 }
 toast("ถูกต้อง ✅ ไปหน้าสุดท้าย");
+sfxSuccess();
 fireworksBurst(18);
-burstConfetti(220);
-goStep(7);
+burstConfetti(240);
+hide("colorPanel");
+step = 10; setProgress();
+show("finalPanel");
 });
 $("colorInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("btnColor").click(); });
+
+/* Ensure when leaving game2 to gate */
+(function gateAfterGames(){
+const original = goStep;
+// already overridden earlier; just ensure proper state when step=3
+// (panel switching handled in goStep)
+})();
 </script>
 </body>
-
 </html>
