@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
 <title>🎄 ภารกิจวันเกิด</title>
 
 <style>
@@ -48,8 +48,6 @@ opacity:.95;
 .lights i{
 width:10px; height:18px;
 border-radius:999px;
-background:rgba(255,255,255,.6);
-box-shadow:0 0 14px rgba(255,255,255,.35);
 animation:twinkle 1.2s infinite ease-in-out;
 }
 .lights i:nth-child(3n){ animation-delay:.2s; }
@@ -172,6 +170,12 @@ animation: blink .9s steps(2,start) infinite;
 }
 @keyframes blink{ 50%{ opacity:0; } }
 
+.hl{
+color: var(--gold);
+font-weight: 700;
+text-shadow: 0 0 10px rgba(255,217,102,.22);
+}
+
 .toast{
 position:fixed;
 left:50%;
@@ -195,7 +199,7 @@ opacity:1;
 transform:translateX(-50%) translateY(4px);
 }
 
-/* ===== Intro envelope ===== */
+/* ===== Intro envelope (เปิดซองจริง) ===== */
 .envelope{
 width: min(520px, 92vw);
 margin: 0 auto;
@@ -206,23 +210,118 @@ padding: 16px;
 position: relative;
 overflow: hidden;
 }
-.env-top{
-height: 120px;
-border-radius: 14px;
-background:
-linear-gradient(135deg, rgba(255,255,255,.10), rgba(0,0,0,.10));
-border:1px solid rgba(255,255,255,.10);
+
+.env-stage{
 position:relative;
+height: 210px;
+border-radius: 16px;
+border:1px solid rgba(255,255,255,.10);
+background:
+radial-gradient(220px 120px at 30% 10%, rgba(255,255,255,.12), transparent),
+linear-gradient(135deg, rgba(255,255,255,.10), rgba(0,0,0,.10));
+overflow:hidden;
 }
-.env-top:before{
+
+.paper{
+position:absolute;
+left:50%;
+bottom:18px;
+width: 78%;
+height: 155px;
+transform: translateX(-50%) translateY(120px);
+border-radius: 12px;
+background:
+linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+border:1px solid rgba(0,0,0,.08);
+box-shadow: 0 18px 40px rgba(0,0,0,.35);
+opacity:.96;
+}
+.paper:before{
 content:"";
 position:absolute;
-inset:-24px -24px auto -24px;
-height: 140px;
-background: linear-gradient(180deg, rgba(255,255,255,.20), transparent);
-transform: skewY(-8deg);
-opacity:.25;
+inset:12px;
+border-radius: 10px;
+border:1px dashed rgba(0,0,0,.12);
 }
+.paper .paperText{
+position:absolute;
+left:14px; right:14px; top:18px;
+color:#1b2a66;
+font-weight:700;
+font-size:12px;
+opacity:.85;
+letter-spacing:.2px;
+}
+
+.env-body{
+position:absolute;
+left:50%;
+bottom:0;
+width: 86%;
+height: 120px;
+transform: translateX(-50%);
+border-radius: 14px;
+background: rgba(0,0,0,.20);
+border: 1px solid rgba(255,255,255,.14);
+backdrop-filter: blur(6px);
+overflow:hidden;
+}
+.env-body:before{
+content:"";
+position:absolute;
+inset:0;
+background: linear-gradient(180deg, rgba(255,255,255,.10), transparent);
+opacity:.5;
+}
+
+.flap{
+position:absolute;
+left:50%;
+bottom: 88px;
+width: 86%;
+height: 92px;
+transform: translateX(-50%);
+transform-origin: 50% 100%;
+background: rgba(0,0,0,.22);
+border: 1px solid rgba(255,255,255,.14);
+border-bottom:none;
+clip-path: polygon(0 100%, 50% 0, 100% 100%);
+border-radius: 14px;
+box-shadow: 0 12px 30px rgba(0,0,0,.35);
+}
+
+.sparkle{
+position:absolute;
+inset:0;
+pointer-events:none;
+opacity:0;
+background:
+radial-gradient(4px 4px at 20% 30%, rgba(255,217,102,.95), transparent 60%),
+radial-gradient(3px 3px at 60% 24%, rgba(255,217,102,.85), transparent 60%),
+radial-gradient(4px 4px at 75% 45%, rgba(255,217,102,.95), transparent 60%),
+radial-gradient(3px 3px at 40% 55%, rgba(255,217,102,.85), transparent 60%),
+radial-gradient(4px 4px at 55% 70%, rgba(255,217,102,.95), transparent 60%);
+filter: drop-shadow(0 0 10px rgba(255,217,102,.22));
+}
+
+.env-open .flap{ animation: flapOpen .9s ease forwards; }
+.env-open .paper{ animation: paperUp 1.05s ease forwards; }
+.env-open .sparkle{ animation: sparkle 1.2s ease forwards; }
+@keyframes flapOpen{
+0%{ transform: translateX(-50%) rotateX(0deg); }
+100%{ transform: translateX(-50%) rotateX(160deg); }
+}
+@keyframes paperUp{
+0%{ transform: translateX(-50%) translateY(120px); }
+70%{ transform: translateX(-50%) translateY(2px); }
+100%{ transform: translateX(-50%) translateY(12px); }
+}
+@keyframes sparkle{
+0%{ opacity:0; }
+30%{ opacity:1; }
+100%{ opacity:0; }
+}
+
 .env-mid{
 margin-top: 12px;
 padding: 14px;
@@ -232,32 +331,19 @@ border:1px solid rgba(255,255,255,.12);
 text-align:center;
 }
 
-.fingerWrap{
-display:flex;
-justify-content:center;
-margin-top:12px;
-}
+.fingerWrap{ display:flex; justify-content:center; margin-top:12px; }
 .finger{
-width:110px;
-height:110px;
-border-radius:999px;
+width:110px; height:110px; border-radius:999px;
 border:1px solid rgba(255,255,255,.16);
 background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.14), rgba(0,0,0,.20));
 box-shadow: 0 18px 50px rgba(0,0,0,.35);
-display:flex;
-align-items:center;
-justify-content:center;
+display:flex; align-items:center; justify-content:center;
 position:relative;
 touch-action:none;
 }
-.finger svg{
-width:64px; height:64px;
-opacity:.92;
-filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
-}
+.finger svg{ width:64px; height:64px; opacity:.92; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
 .ring{
-position:absolute;
-inset:8px;
+position:absolute; inset:8px;
 border-radius:999px;
 border:2px solid rgba(255,255,255,.10);
 }
@@ -267,18 +353,11 @@ position:absolute;
 inset:-2px;
 border-radius:999px;
 border:2px solid rgba(102,255,204,.85);
-clip-path: polygon(50% 50%, 50% 0, 50% 0, 50% 50%);
+clip-path: var(--wedge, polygon(50% 50%, 50% 0, 50% 0, 50% 50%));
 opacity:0;
 }
-.finger.holding .ring::after{
-opacity:1;
-animation: none;
-}
-.holdText{
-margin-top:10px;
-color:var(--muted);
-font-size:13px;
-}
+.finger.holding .ring::after{ opacity:1; }
+.holdText{ margin-top:10px; color:var(--muted); font-size:13px; }
 
 /* ===== Timing game ===== */
 .timingBox{
@@ -296,8 +375,7 @@ border:1px solid rgba(255,255,255,.12);
 overflow:hidden;
 }
 .timingZone{
-position:absolute;
-top:0; bottom:0;
+position:absolute; top:0; bottom:0;
 left: 42%;
 width: 16%;
 background: linear-gradient(90deg, rgba(255,217,102,.35), rgba(255,217,102,.65));
@@ -327,22 +405,55 @@ color:var(--muted);
 font-size:12px;
 }
 
-/* ===== Maze canvas ===== */
-.mazeWrap{
+/* ===== Countdown ===== */
+.countGrid{
 display:grid;
-gap:12px;
+grid-template-columns: repeat(4, 1fr);
+gap:10px;
+margin-top:10px;
 }
-#maze{
-  width:100%;
-  height:auto;
-  display:block;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.18);
-  touch-action:none;
-  -webkit-user-select:none;
-  user-select:none;
-  -webkit-touch-callout:none;
+@media(max-width:680px){
+.countGrid{ grid-template-columns: repeat(2, 1fr); }
+}
+.stat{
+border-radius:14px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.22);
+padding:12px;
+text-align:center;
+}
+.stat .num{
+font-size:20px;
+font-weight:800;
+color: var(--gold);
+text-shadow: 0 0 12px rgba(255,217,102,.20);
+}
+.stat .lab{
+font-size:12px;
+color:var(--muted);
+margin-top:4px;
+}
+
+/* ===== Gift ===== */
+.giftBox{
+margin-top:12px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.22);
+padding:14px;
+}
+.coupon{
+margin-top:10px;
+border-radius:14px;
+border:1px dashed rgba(255,217,102,.45);
+background: rgba(255,217,102,.08);
+padding:12px;
+color: var(--fg);
+}
+.coupon .title{
+font-weight:900;
+color: var(--gold);
+margin-bottom:6px;
 }
 </style>
 </head>
@@ -358,33 +469,38 @@ gap:12px;
 <!-- LEFT -->
 <div class="card">
 <h1>🎄 ภารกิจวันเกิด (PEACE → Cartoon)</h1>
-<p class="sub">เริ่มจากการ “สแกนลายนิ้วมือ” → เล่น 2 เกม → แล้วค่อยเข้าสู่ภารกิจหลัก</p>
+<p class="sub">สแกนลายนิ้วมือ → เปิดซอง → หน้าวันคบ → เกม Timing → ภารกิจหลัก → จดหมาย → ของขวัญลับ</p>
 
 <!-- Progress -->
 <div class="panel">
 <div class="row" style="justify-content:space-between;">
 <div class="sub">สถานะ</div>
-<div class="sub">ขั้นตอน <span id="stepLabel">0</span>/9</div>
+<div class="sub">ขั้นตอน <span id="stepLabel">0</span>/10</div>
 </div>
 <div class="bar" style="margin-top:8px"><div class="fill" id="fill"></div></div>
 </div>
 
-<!-- INTRO: Envelope + fingerprint hold -->
+<!-- INTRO -->
 <div class="panel" id="introPanel" style="margin-top:12px">
 <p class="big">✉️ จดหมายลับ</p>
 <p class="sub">สแกนลายนิ้วมือเพื่อปลดล็อก</p>
 
 <div class="envelope">
-<div class="env-top"></div>
-<div class="env-mid">
-<div class="sub" style="margin:0">
-โปรดสแกนลายนิ้วมือ
+<div class="env-stage" id="envStage">
+<div class="sparkle"></div>
+<div class="paper">
+<div class="paperText">To: Cartoon 💛</div>
 </div>
+<div class="flap"></div>
+<div class="env-body"></div>
+</div>
+
+<div class="env-mid">
+<div class="sub" style="margin:0">โปรดสแกนลายนิ้วมือ</div>
 
 <div class="fingerWrap">
 <div class="finger" id="finger">
 <div class="ring"></div>
-<!-- fingerprint icon -->
 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
 <path d="M12 3c-4 0-7 3-7 7v3c0 3.314 2.686 6 6 6h1" stroke="rgba(234,242,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
 <path d="M12 6c-2.5 0-4 1.8-4 4v3c0 2.2 1.8 4 4 4" stroke="rgba(234,242,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
@@ -400,17 +516,37 @@ gap:12px;
 
 <div class="row" style="margin-top:12px; justify-content:space-between;">
 <button id="btnFxIntro">🎆 เอฟเฟกต์</button>
-<span class="badge">Tip: iPad ต้อง “แตะ” เพื่อให้เสียง/เพลงทำงาน</span>
+<span class="badge">Tip: iPad ต้องแตะเพื่อให้เสียงทำงาน</span>
 </div>
 </div>
 
-<!-- GAME 1: Timing bar -->
-<div class="panel hidden" id="game1Panel" style="margin-top:12px">
-<p class="big">เกมที่ 1: Timing Bar</p>
+<!-- COUPLE DAY PANEL -->
+<div class="panel hidden" id="lovePanel" style="margin-top:12px">
+<p class="big">💞 วันคบของเรา</p>
+<p class="sub">
+คบตั้งแต่ <span class="prompt">18/12/2565</span><br>
+ครบ 3 ปีที่ <span class="prompt">18/12/2568</span> = <span class="prompt">1,096 วัน</span>
+</p>
+
+<div class="countGrid">
+<div class="stat"><div class="num" id="dNow">—</div><div class="lab">วัน (วันนี้คบมาแล้ว)</div></div>
+<div class="stat"><div class="num" id="hNow">—</div><div class="lab">ชั่วโมง</div></div>
+<div class="stat"><div class="num" id="mNow">—</div><div class="lab">นาที</div></div>
+<div class="stat"><div class="num" id="sNow">—</div><div class="lab">วินาที</div></div>
+</div>
+
+<div class="row" style="margin-top:12px; justify-content:flex-end;">
+<button id="btnLoveNext">ไปเล่นเกมต่อ ▶</button>
+</div>
+</div>
+
+<!-- GAME: Timing bar -->
+<div class="panel hidden" id="gamePanel" style="margin-top:12px">
+<p class="big">เกม: Timing Bar</p>
 <p class="sub">กด “หยุด” ให้แท่งอยู่ใน “โซนสีทอง” ให้สำเร็จ 2 ครั้ง</p>
 
 <div class="timingBox">
-<div class="timingTrack" id="timingTrack">
+<div class="timingTrack">
 <div class="timingZone"></div>
 <div class="timingPointer" id="timingPointer"></div>
 </div>
@@ -426,22 +562,6 @@ gap:12px;
 <button id="btnTimingReset">รีเซ็ต</button>
 </div>
 <div class="err" id="timingErr"></div>
-</div>
-
-<!-- GAME 2: Maze -->
-<div class="panel hidden" id="game2Panel" style="margin-top:12px">
-<p class="big">เกมที่ 2: ไปให้ถึงหัวใจ</p>
-<p class="sub">แตะจุดเริ่ม (วงกลมซ้าย) แล้วลากนิ้วไปตามทางให้ถึงหัวใจ ❤️</p>
-
-<div class="mazeWrap">
-<canvas id="maze" width="820" height="360"></canvas>
-<div class="mazeHint" id="mazeHint">ห้ามหลุดออกนอกทาง ถ้าหลุดจะเริ่มใหม่อัตโนมัติ</div>
-</div>
-
-<div class="row" style="margin-top:12px">
-<button id="btnMazeReset">เริ่มใหม่</button>
-</div>
-<div class="err" id="mazeErr"></div>
 </div>
 
 <!-- ======= ORIGINAL FLOW (เดิม) ======= -->
@@ -485,7 +605,14 @@ gap:12px;
 </div>
 
 <div class="panel hidden" id="letterPanel" style="margin-top:12px">
-<p class="big">📩 จดหมายถึง Cartoon</p>
+<div class="row" style="justify-content:space-between; align-items:flex-start;">
+<div>
+<p class="big" style="margin-bottom:6px;">📩 จดหมายถึง Cartoon</p>
+<p class="sub" style="margin-top:0;">โหมดพิมพ์ดีด (เปิด/ปิดเสียงได้)</p>
+</div>
+<button id="btnTypeSound">🔊 เสียงพิมพ์ดีด: เปิด</button>
+</div>
+
 <div class="letter" id="letterText"></div>
 <div class="row" style="margin-top:12px; justify-content:flex-end;">
 <button id="btnNextAfterLetter" disabled>ถัดไป</button>
@@ -508,9 +635,15 @@ gap:12px;
 
 <div class="row" style="justify-content:space-between;">
 <button id="btnPlay2">▶ เล่น/หยุด เพลงสุดท้าย</button>
+<button id="btnGift">เปิดของขวัญลับ 🎁</button>
 </div>
 
 <audio id="song2" preload="auto" controls style="width:100%; margin-top:10px;"></audio>
+
+<div class="giftBox hidden" id="giftBox">
+<div class="sub" style="margin:0;">สุ่มได้ 1 ครั้งต่อการเปิดเว็บ</div>
+<div class="coupon" id="coupon"></div>
+</div>
 </div>
 </div>
 
@@ -520,15 +653,9 @@ gap:12px;
 <p class="sub">รูปจะขึ้นทีละรูปเมื่อทำภารกิจถูกต้อง</p>
 
 <div class="gallery">
-<div class="photo" id="imgBox1">
-<div class="sub">รูปที่ 1 (หลังภารกิจ 1)</div>
-</div>
-<div class="photo" id="imgBox2">
-<div class="sub">รูปที่ 2 (หลังภารกิจ 2)</div>
-</div>
-<div class="photo" id="imgBox3">
-<div class="sub">รูปที่ 3 (หลังภารกิจ 3)</div>
-</div>
+<div class="photo" id="imgBox1"><div class="sub">รูปที่ 1 (หลังภารกิจ 1)</div></div>
+<div class="photo" id="imgBox2"><div class="sub">รูปที่ 2 (หลังภารกิจ 2)</div></div>
+<div class="photo" id="imgBox3"><div class="sub">รูปที่ 3 (หลังภารกิจ 3)</div></div>
 </div>
 
 <div class="panel" style="margin-top:12px">
@@ -542,7 +669,7 @@ gap:12px;
 
 <script>
 /* =========================
-CONFIG (แก้ตรงนี้จุดเดียว)
+CONFIG
 ========================= */
 const CONFIG = {
 cartoonBirthday: "18/12/2006", // ✅ เปลี่ยนเป็นวันเกิดจริงของ Cartoon (DD/MM/YYYY)
@@ -553,11 +680,21 @@ img2: "p2.jpg",
 img3: "p3.jpg",
 };
 
+const HIGHLIGHTS = ["Happy Birthday", "Cartoon", "ดอกไม้"];
+
+const COUPONS = [
+"คูปองกอดฟรี 10 นาที",
+"วันตามใจ Cartoon 1 วันเต็ม",
+"ถ่ายรูป Photo Booth",
+"บอกรัก 10 รอบ",
+"โอนตังคืน 10 บาท",
+];
+
 const LETTER = `Happy Birthday ครับอ้วน ขอให้ตั้งแต่วันนี้และตลอดไปเป็นวันที่ดีของเธอ ขอให้มีความสุขมากๆในทุกๆวัน ทนฟังเราพูดไปนานๆ บางทีเราอาจจะทะเลาะกันไม่พอใจกันบ้าง แต่ไม่เป็นไรเพราะเค้าถูกเสมอ หยอกจั้ฟ นั่นแหละมีความสุขมากๆเด้ออ้วน จาก PEACE สุดหล่อ ถึง เธอที่เป็นดอกไม้ที่สวยสดงดงาม สี…`;
 
 /* =========================
-State
-steps: 0 intro, 1 game1, 2 game2, 3 gate, 4..9 missions/final
+Steps
+0 intro, 1 love, 2 game, 3 gate, 4 m1, 5 m2, 6 m3, 7 ready, 8 letter, 9 color, 10 final
 ========================= */
 let step = 0;
 
@@ -571,18 +708,15 @@ setTimeout(()=>t.classList.remove("show"), 1600);
 const norm = (s)=> (s ?? "").trim();
 const normLower = (s)=> norm(s).toLowerCase();
 
-/* progress */
 function setProgress(){
-const total = 9;
+const total = 10;
 const pct = Math.min(100, Math.round((step/total)*100));
 $("stepLabel").textContent = step;
 $("fill").style.width = pct + "%";
 }
 setProgress();
 
-/* =========================
-Christmas lights
-========================= */
+/* ===== lights ===== */
 (function buildLights(){
 const el = $("lights");
 if(!el) return;
@@ -598,17 +732,16 @@ el.appendChild(b);
 }
 })();
 
-/* =========================
-SFX (WebAudio)
-========================= */
+/* ===== SFX / Typewriter Sound ===== */
 let audioCtx = null;
+let typeSoundOn = true; // เปิดเริ่มต้น
 function ensureAudio(){
 if(!audioCtx){
 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 if(audioCtx.state === "suspended") audioCtx.resume();
 }
-function beep({freq=880, dur=0.10, type="sine", vol=0.05} = {}){
+function beep({freq=880, dur=0.06, type="sine", vol=0.03} = {}){
 try{
 ensureAudio();
 const o = audioCtx.createOscillator();
@@ -621,12 +754,14 @@ o.start();
 o.stop(audioCtx.currentTime + dur);
 }catch(e){}
 }
-function sfxSuccess(){ beep({freq:988,dur:0.08,vol:0.06}); setTimeout(()=>beep({freq:1319,dur:0.10,vol:0.06}), 90); }
+function sfxSuccess(){ beep({freq:988,dur:0.08,vol:0.05}); setTimeout(()=>beep({freq:1319,dur:0.10,vol:0.05}), 90); }
 function sfxFail(){ beep({freq:220,dur:0.12,type:"square",vol:0.03}); }
+function typeTick(){
+if(!typeSoundOn) return;
+beep({freq: 900 + Math.random()*120, dur: 0.025, type:"square", vol: 0.01});
+}
 
-/* =========================
-Effects: Snow / Confetti / Fireworks
-========================= */
+/* ===== Effects: Snow / Confetti / Fireworks ===== */
 const c0 = $("snow"), x0 = c0.getContext("2d");
 const c1 = $("confetti"), x1 = c1.getContext("2d");
 const c2 = $("fire"), x2 = c2.getContext("2d");
@@ -747,9 +882,7 @@ if(sparks.length>0) requestAnimationFrame(tickFire);
 else { fireLooping=false; x2.clearRect(0,0,c2.width,c2.height); }
 }
 
-/* =========================
-Audio: กันเพลงซ้อนกัน
-========================= */
+/* ===== Audio: กันเพลงซ้อนกัน ===== */
 const song1 = $("song1");
 const song2 = $("song2");
 song1.src = CONFIG.song1;
@@ -780,9 +913,7 @@ alert("เล่นเพลงไม่ได้\n\nเช็กว่าไฟ
 }
 }
 
-/* =========================
-UI helpers
-========================= */
+/* ===== UI Step ===== */
 function show(id){ $(id).classList.remove("hidden"); }
 function hide(id){ $(id).classList.add("hidden"); }
 
@@ -790,13 +921,11 @@ function goStep(newStep){
 step = newStep;
 setProgress();
 
-// hide all main panels
-["introPanel","game1Panel","game2Panel","gatePanel","missionPanel","letterPanel","colorPanel","finalPanel"]
-.forEach(hide);
+["introPanel","lovePanel","gamePanel","gatePanel","missionPanel","letterPanel","colorPanel","finalPanel"].forEach(hide);
 
 if(step===0) show("introPanel");
-if(step===1) show("game1Panel");
-if(step===2) show("game2Panel");
+if(step===1) show("lovePanel");
+if(step===2) show("gamePanel");
 if(step===3) show("gatePanel");
 if(step>=4 && step<=7) show("missionPanel");
 if(step===8) show("letterPanel");
@@ -805,15 +934,13 @@ if(step===10) show("finalPanel");
 }
 goStep(0);
 
-/* ===== Intro fingerprint hold ===== */
-let holdTimer=null;
+/* ===== Fingerprint Hold + Envelope Open ===== */
+let holdRAF=null;
 let holdStart=0;
 const HOLD_MS = 1600;
+
 function setHoldProgress(pct){
-// ใช้ clip-path แบบ wedge
-const ringAfter = $("finger").querySelector(".ring");
 const a = Math.max(0, Math.min(1, pct));
-// สร้าง wedge polygon แบบง่าย (12 steps)
 const steps = 36;
 const pts = ["50% 50%","50% 0%"];
 const angleMax = a * Math.PI*2;
@@ -823,18 +950,11 @@ const x = 50 + 50*Math.cos(ang);
 const y = 50 + 50*Math.sin(ang);
 pts.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
 }
-// apply to ::after via inline style trick: set CSS variable
 $("finger").style.setProperty("--wedge", `polygon(${pts.join(",")})`);
-// update pseudo style by injecting once
 }
-(function injectWedgeCSS(){
-const s=document.createElement("style");
-s.textContent = `.ring::after{ clip-path: var(--wedge, polygon(50% 50%, 50% 0, 50% 0, 50% 50%)); }`;
-document.head.appendChild(s);
-})();
 
 function holdStartFn(){
-ensureAudio(); // เพื่อให้ iOS ยอมให้เสียงทำงานตั้งแต่แตะครั้งแรก
+ensureAudio(); // iOS gesture
 const finger = $("finger");
 finger.classList.add("holding");
 $("holdText").textContent = "กำลังสแกน...";
@@ -842,49 +962,77 @@ holdStart = performance.now();
 setHoldProgress(0);
 
 function tick(){
-const now = performance.now();
-const dt = now - holdStart;
-const pct = dt / HOLD_MS;
+const pct = (performance.now() - holdStart) / HOLD_MS;
 setHoldProgress(pct);
 if(pct >= 1){
 holdEndFn(true);
 return;
 }
-holdTimer = requestAnimationFrame(tick);
+holdRAF = requestAnimationFrame(tick);
 }
-holdTimer = requestAnimationFrame(tick);
+holdRAF = requestAnimationFrame(tick);
 }
 function holdEndFn(success){
 const finger = $("finger");
 finger.classList.remove("holding");
-if(holdTimer){ cancelAnimationFrame(holdTimer); holdTimer=null; }
+if(holdRAF){ cancelAnimationFrame(holdRAF); holdRAF=null; }
 setHoldProgress(0);
 
 if(success){
+$("envStage").classList.add("env-open");
 toast("ปลดล็อกสำเร็จ ✅");
 sfxSuccess();
-burstConfetti(160);
-fireworksBurst(10);
+burstConfetti(200);
+fireworksBurst(12);
+
 $("holdText").textContent = "ปลดล็อกแล้ว";
-setTimeout(()=>goStep(1), 450);
+setTimeout(()=>goStep(1), 1100);
 }else{
 $("holdText").textContent = "กดค้างที่ลายนิ้วมือ";
 }
 }
+
 (function setupHold(){
 const finger = $("finger");
 const down = (e)=>{ e.preventDefault(); if(step!==0) return; holdStartFn(); };
 const up = (e)=>{ e.preventDefault(); if(step!==0) return; holdEndFn(false); };
-finger.addEventListener("pointerdown", down);
-window.addEventListener("pointerup", up);
-window.addEventListener("pointercancel", up);
+
+finger.addEventListener("pointerdown", down, {passive:false});
+window.addEventListener("pointerup", up, {passive:false});
+window.addEventListener("pointercancel", up, {passive:false});
 })();
 
 $("btnFxIntro").addEventListener("click", ()=>{ burstConfetti(180); fireworksBurst(14); });
 
-/* =========================
-GAME 1: Timing Bar
-========================= */
+/* ===== Love Counter ===== */
+function makeDateTH(ddmmyyyy){
+const [dd,mm,yyyy]=ddmmyyyy.split("/").map(Number);
+const y = yyyy - 543;
+return new Date(y, mm-1, dd, 0,0,0,0);
+}
+const START_DATE = makeDateTH("18/12/2565");
+
+function updateLoveNow(){
+const now = new Date();
+let ms = now.getTime() - START_DATE.getTime();
+if(ms < 0) ms = 0;
+
+const sec = Math.floor(ms / 1000);
+const min = Math.floor(sec / 60);
+const hr = Math.floor(min / 60);
+const day = Math.floor(hr / 24);
+
+$("dNow").textContent = String(day);
+$("hNow").textContent = String(hr % 24);
+$("mNow").textContent = String(min % 60);
+$("sNow").textContent = String(sec % 60);
+}
+updateLoveNow();
+setInterval(updateLoveNow, 1000);
+
+$("btnLoveNext").addEventListener("click", ()=>goStep(2));
+
+/* ===== Timing Game ===== */
 let timingRAF=null;
 let timingPos=0.0;
 let timingDir=1;
@@ -905,7 +1053,7 @@ timingRunning = true;
 $("btnTimingStart").disabled = true;
 $("btnTimingStop").disabled = false;
 
-const speed = 0.9; // cycles per second-ish
+const speed = 0.9;
 let last = performance.now();
 function loop(now){
 if(!timingRunning) return;
@@ -930,7 +1078,6 @@ if(timingRAF){ cancelAnimationFrame(timingRAF); timingRAF=null; }
 $("btnTimingStart").disabled = false;
 $("btnTimingStop").disabled = true;
 
-// zone: left 42%, width 16% => [0.42, 0.58]
 timingTry++;
 const ok = (timingPos >= 0.42 && timingPos <= 0.58);
 
@@ -938,7 +1085,7 @@ if(ok){
 timingWin++;
 sfxSuccess();
 toast("โดนโซนทอง ✅");
-burstConfetti(120);
+burstConfetti(140);
 }else{
 sfxFail();
 toast("พลาด! ลองใหม่");
@@ -946,12 +1093,11 @@ toast("พลาด! ลองใหม่");
 timingUpdateUI();
 
 if(timingWin >= 2){
-toast("ผ่านเกมที่ 1 ✅");
+toast("ผ่านเกมแล้ว ✅");
 fireworksBurst(12);
-setTimeout(()=>goStep(2), 550);
+setTimeout(()=>goStep(3), 550);
 return;
 }
-
 if(timingTry >= 3 && timingWin < 2){
 $("timingErr").textContent = "ยังไม่ผ่าน (ต้องสำเร็จ 2 ครั้ง) — กดรีเซ็ตเพื่อเริ่มใหม่";
 }
@@ -975,225 +1121,7 @@ $("btnTimingStart").addEventListener("click", timingStart);
 $("btnTimingStop").addEventListener("click", timingStop);
 $("btnTimingReset").addEventListener("click", timingReset);
 
-/* =========================
-GAME 2: Maze (trace path)
-========================= */
-const maze = $("maze");
-const mx = maze.getContext("2d");
-
-// Define a polyline path in canvas coords
-const PATH = [
-{x: 70, y: 180},
-{x: 170, y: 180},
-{x: 170, y: 90},
-{x: 330, y: 90},
-{x: 330, y: 260},
-{x: 520, y: 260},
-{x: 520, y: 120},
-{x: 680, y: 120},
-{x: 680, y: 200},
-{x: 760, y: 200},
-];
-const PATH_WIDTH = 22;
-const START = {x: PATH[0].x, y: PATH[0].y, r: 16};
-const END = {x: PATH[PATH.length-1].x, y: PATH[PATH.length-1].y, r: 18};
-
-let tracing=false;
-
-function distToSegment(px,py, ax,ay, bx,by){
-const vx = bx-ax, vy = by-ay;
-const wx = px-ax, wy = py-ay;
-const c1 = vx*wx + vy*wy;
-if(c1 <= 0) return Math.hypot(px-ax, py-ay);
-const c2 = vx*vx + vy*vy;
-if(c2 <= c1) return Math.hypot(px-bx, py-by);
-const t = c1 / c2;
-const projx = ax + t*vx, projy = ay + t*vy;
-return Math.hypot(px-projx, py-projy);
-}
-
-function insidePath(px,py){
-// within width from any segment
-for(let i=0;i<PATH.length-1;i++){
-const a=PATH[i], b=PATH[i+1];
-const d = distToSegment(px,py,a.x,a.y,b.x,b.y);
-if(d <= PATH_WIDTH) return true;
-}
-return false;
-}
-
-function drawMaze(){
-mx.clearRect(0,0,maze.width,maze.height);
-
-// glow background lines
-mx.lineCap = "round";
-mx.lineJoin = "round";
-
-// corridor (thick)
-mx.beginPath();
-mx.moveTo(PATH[0].x, PATH[0].y);
-for(let i=1;i<PATH.length;i++) mx.lineTo(PATH[i].x, PATH[i].y);
-mx.strokeStyle = "rgba(255,255,255,.10)";
-mx.lineWidth = PATH_WIDTH*2 + 12;
-mx.stroke();
-
-// actual path
-mx.beginPath();
-mx.moveTo(PATH[0].x, PATH[0].y);
-for(let i=1;i<PATH.length;i++) mx.lineTo(PATH[i].x, PATH[i].y);
-mx.strokeStyle = "rgba(102,255,204,.75)";
-mx.lineWidth = PATH_WIDTH*2;
-mx.stroke();
-
-// start circle
-mx.beginPath();
-mx.arc(START.x, START.y, START.r, 0, Math.PI*2);
-mx.fillStyle = "rgba(134,168,255,.35)";
-mx.fill();
-mx.strokeStyle = "rgba(234,242,255,.35)";
-mx.lineWidth = 2;
-mx.stroke();
-mx.fillStyle = "rgba(234,242,255,.9)";
-mx.font = "12px ui-monospace";
-mx.fillText("START", START.x-18, START.y+4);
-
-// end (heart)
-mx.save();
-mx.translate(END.x, END.y);
-mx.fillStyle = "rgba(255,77,77,.9)";
-mx.beginPath();
-mx.moveTo(0, 6);
-mx.bezierCurveTo(0,-10, 22,-10, 22, 6);
-mx.bezierCurveTo(22, 22, 0, 32, 0, 44);
-mx.bezierCurveTo(0, 32, -22, 22, -22, 6);
-mx.bezierCurveTo(-22,-10, 0,-10, 0, 6);
-mx.closePath();
-mx.scale(0.45,0.45);
-mx.fill();
-mx.restore();
-mx.fillStyle = "rgba(255,217,102,.9)";
-mx.font = "12px ui-monospace";
-mx.fillText("❤️", END.x-6, END.y+5);
-}
-
-function mazeReset(msg){
-tracing=false;
-$("mazeErr").textContent = msg || "";
-drawMaze();
-}
-
-function canvasPointFromEvent(e){
-const rect = maze.getBoundingClientRect();
-const cx = (e.clientX - rect.left) * (maze.width / rect.width);
-const cy = (e.clientY - rect.top) * (maze.height / rect.height);
-return {x:cx,y:cy};
-}
-
-function nearStart(p){
-return Math.hypot(p.x-START.x, p.y-START.y) <= START.r + 10;
-}
-function reachedEnd(p){
-return Math.hypot(p.x-END.x, p.y-END.y) <= END.r + 18;
-}
-
- /* ===== Maze Input (รองรับ iOS: pointer + touch) ===== */
-function onMazeDown(clientX, clientY){
-  if(step !== 2) return;
-
-  const rect = maze.getBoundingClientRect();
-  const p = {
-    x: (clientX - rect.left) * (maze.width / rect.width),
-    y: (clientY - rect.top) * (maze.height / rect.height)
-  };
-
-  if(nearStart(p)){
-    tracing = true;
-    $("mazeErr").textContent = "";
-    sfxSuccess();
-  }else{
-    tracing = false;
-    sfxFail();
-    $("mazeErr").textContent = "ต้องแตะเริ่มที่วงกลม START ก่อน";
-  }
-}
-
-function onMazeMove(clientX, clientY){
-  if(step !== 2) return;
-  if(!tracing) return;
-
-  const rect = maze.getBoundingClientRect();
-  const p = {
-    x: (clientX - rect.left) * (maze.width / rect.width),
-    y: (clientY - rect.top) * (maze.height / rect.height)
-  };
-
-  if(!insidePath(p.x, p.y)){
-    sfxFail();
-    mazeReset("หลุดออกนอกทาง — เริ่มใหม่");
-    return;
-  }
-
-  if(reachedEnd(p)){
-    tracing = false;
-    sfxSuccess();
-    toast("ผ่านเกมที่ 2 ✅");
-    burstConfetti(200);
-    fireworksBurst(14);
-    setTimeout(()=>goStep(3), 550);
-  }
-}
-
-function onMazeUp(){
-  if(step === 2) tracing = false;
-}
-
-/* --- Pointer events --- */
-maze.addEventListener("pointerdown", (e)=>{
-  if(step !== 2) return;
-  e.preventDefault();
-  onMazeDown(e.clientX, e.clientY);
-}, { passive:false });
-
-maze.addEventListener("pointermove", (e)=>{
-  if(step !== 2) return;
-  e.preventDefault();
-  onMazeMove(e.clientX, e.clientY);
-}, { passive:false });
-
-window.addEventListener("pointerup", onMazeUp, { passive:true });
-window.addEventListener("pointercancel", onMazeUp, { passive:true });
-
-/* --- Touch events (สำคัญสำหรับ iPad) --- */
-maze.addEventListener("touchstart", (e)=>{
-  if(step !== 2) return;
-  e.preventDefault();
-  const t = e.touches[0];
-  onMazeDown(t.clientX, t.clientY);
-}, { passive:false });
-
-maze.addEventListener("touchmove", (e)=>{
-  if(step !== 2) return;
-  e.preventDefault();
-  const t = e.touches[0];
-  onMazeMove(t.clientX, t.clientY);
-}, { passive:false });
-
-window.addEventListener("touchend", onMazeUp, { passive:true });
-window.addEventListener("touchcancel", onMazeUp, { passive:true });
-
-$("btnMazeReset").addEventListener("click", ()=>mazeReset(""));
-
-/* draw when entering game2 */
-const origGoStep = goStep;
-goStep = function(newStep){
-origGoStep(newStep);
-if(newStep===2) mazeReset("");
-};
-goStep(0);
-
-/* =========================
-ORIGINAL FLOW (เดิม)
-========================= */
+/* ===== ORIGINAL FLOW ===== */
 function setMission(title, desc, placeholder){
 $("missionTitle").textContent = title;
 $("missionDesc").textContent = desc;
@@ -1228,31 +1156,45 @@ box.appendChild(img); box.appendChild(cap);
 }
 }
 
-/* typewriter */
+/* typewriter + highlight */
 let typingTimer=null;
+function escapeHtml(s){
+return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function applyHighlight(html){
+let out = html;
+for(const word of HIGHLIGHTS){
+const w = escapeHtml(word);
+out = out.split(w).join(`<span class="hl">${w}</span>`);
+}
+return out;
+}
+function renderTyped(text){
+const safe = escapeHtml(text);
+const hi = applyHighlight(safe);
+$("letterText").innerHTML = hi + `<span class="cursor">▍</span>`;
+}
 function typeLetter(text){
-const box=$("letterText");
 const btn=$("btnNextAfterLetter");
 if(typingTimer) clearInterval(typingTimer);
 
 btn.disabled = true;
-box.innerHTML = "";
-
-const cursor=document.createElement("span");
-cursor.className="cursor";
-cursor.textContent="▍";
-box.appendChild(cursor);
+$("letterText").innerHTML = `<span class="cursor">▍</span>`;
 
 let i=0;
+let current="";
 typingTimer = setInterval(()=>{
 if(i >= text.length){
 clearInterval(typingTimer);
 typingTimer=null;
-cursor.remove();
+const safe = escapeHtml(current);
+$("letterText").innerHTML = applyHighlight(safe);
 btn.disabled = false;
 return;
 }
-cursor.insertAdjacentText("beforebegin", text[i]);
+current += text[i];
+if(text[i] !== " " && text[i] !== "\n") typeTick();
+renderTyped(current);
 i++;
 }, 22);
 }
@@ -1265,8 +1207,21 @@ $("btnFxMission").addEventListener("click", ()=>{ burstConfetti(200); fireworksB
 $("btnPlay1").addEventListener("click", ()=> togglePlay(song1, $("btnPlay1"), "▶ เล่น/หยุด เพลงหน้าแรก", "⏸ หยุดเพลงหน้าแรก"));
 $("btnPlay2").addEventListener("click", ()=> togglePlay(song2, $("btnPlay2"), "▶ เล่น/หยุด เพลงสุดท้าย", "⏸ หยุดเพลงสุดท้าย"));
 
+/* type sound toggle */
+function updateTypeBtn(){
+$("btnTypeSound").textContent = typeSoundOn ? "🔊 เสียงพิมพ์ดีด: เปิด" : "🔇 เสียงพิมพ์ดีด: ปิด";
+}
+updateTypeBtn();
+$("btnTypeSound").addEventListener("click", ()=>{
+ensureAudio();
+typeSoundOn = !typeSoundOn;
+updateTypeBtn();
+toast(typeSoundOn ? "เปิดเสียงพิมพ์ดีด" : "ปิดเสียงพิมพ์ดีด");
+});
+
 /* gate start */
 $("btnStart").addEventListener("click", ()=>{
+ensureAudio();
 const v = norm($("startPw").value);
 $("startErr").textContent = "";
 
@@ -1281,7 +1236,6 @@ sfxSuccess();
 burstConfetti(160);
 fireworksBurst(10);
 
-// jump to mission step 4
 step = 4; setProgress();
 hide("gatePanel"); show("missionPanel");
 setMission(
@@ -1290,11 +1244,11 @@ setMission(
 "พิมพ์เป็นรูปแบบ DD/MM/YYYY"
 );
 });
-
 $("startPw").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("btnStart").click(); });
 
 /* mission submit */
 $("btnSubmit").addEventListener("click", ()=>{
+ensureAudio();
 const ansRaw = norm($("missionInput").value);
 const ansLower = normLower(ansRaw);
 $("missionErr").textContent = "";
@@ -1372,7 +1326,6 @@ typeLetter(LETTER);
 return;
 }
 });
-
 $("missionInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("btnSubmit").click(); });
 
 /* letter next */
@@ -1384,6 +1337,7 @@ show("colorPanel");
 
 /* color */
 $("btnColor").addEventListener("click", ()=>{
+ensureAudio();
 const v = norm($("colorInput").value);
 $("colorErr").textContent = "";
 if(v !== "ทอง"){
@@ -1401,12 +1355,413 @@ show("finalPanel");
 });
 $("colorInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("btnColor").click(); });
 
-/* Ensure when leaving game2 to gate */
-(function gateAfterGames(){
-const original = goStep;
-// already overridden earlier; just ensure proper state when step=3
-// (panel switching handled in goStep)
+/* ===== Gift (สุ่มใหม่ได้ทุกครั้งที่เปิดเว็บ) ===== */
+let giftPickedThisSession = false;
+
+function showGift(couponText){
+$("giftBox").classList.remove("hidden");
+$("coupon").innerHTML = `
+<div class="title">🎁 คุณได้รับคูปอง</div>
+<div style="font-size:16px; font-weight:900; color:var(--gold);">${couponText}</div>
+<div class="sub" style="margin:10px 0 0 0;">เก็บไว้ใช้ได้ตลอด 💛</div>
+`;
+}
+function resetGiftUI(){
+giftPickedThisSession = false;
+$("giftBox").classList.add("hidden");
+$("coupon").innerHTML = "";
+$("btnGift").disabled = false;
+$("btnGift").textContent = "เปิดของขวัญลับ 🎁";
+}
+resetGiftUI();
+
+$("btnGift").addEventListener("click", ()=>{
+ensureAudio();
+
+if(giftPickedThisSession){
+toast("สุ่มไปแล้วในรอบนี้ ✅");
+return;
+}
+
+const idx = Math.floor(Math.random() * COUPONS.length);
+const pick = COUPONS[idx];
+
+giftPickedThisSession = true;
+showGift(pick);
+
+$("btnGift").disabled = true;
+$("btnGift").textContent = "สุ่มแล้ว ✅";
+
+burstConfetti(260);
+fireworksBurst(16);
+sfxSuccess();
+toast("เปิดของขวัญลับแล้ว 🎁");
+});
+</script>
+
+<!-- =======================
+PEACE-BOT (LOCAL CHAT WIDGET)
+======================= -->
+<style>
+.pb-fab{
+position:fixed; right:16px; bottom:16px; z-index:9999;
+width:56px; height:56px; border-radius:999px;
+border:1px solid rgba(255,255,255,.18);
+background: linear-gradient(135deg, rgba(102,255,204,.22), rgba(134,168,255,.16));
+color:var(--fg);
+box-shadow:0 18px 55px rgba(0,0,0,.45);
+display:flex; align-items:center; justify-content:center;
+cursor:pointer;
+user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
+}
+.pb-fab:active{ transform: translateY(1px); }
+
+.pb-modal{
+position:fixed; inset:0; z-index:9999;
+display:none;
+background: rgba(0,0,0,.45);
+backdrop-filter: blur(6px);
+}
+.pb-modal.open{ display:block; }
+
+.pb-chat{
+position:absolute;
+right:16px; bottom:84px;
+width:min(380px, calc(100vw - 24px));
+height:min(560px, calc(100vh - 140px));
+border-radius:18px;
+border:1px solid rgba(255,255,255,.14);
+background: rgba(10,16,40,.72);
+box-shadow:0 24px 80px rgba(0,0,0,.55);
+display:flex; flex-direction:column;
+overflow:hidden;
+}
+
+.pb-head{
+padding:12px 12px 10px 12px;
+border-bottom:1px solid rgba(255,255,255,.10);
+display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+}
+.pb-title{ font-weight:900; }
+.pb-sub{ margin-top:4px; color:var(--muted); font-size:12px; line-height:1.4; }
+.pb-badge{
+display:inline-flex; align-items:center;
+padding:6px 10px; border-radius:999px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.20);
+color:var(--muted); font-size:12px;
+white-space:nowrap;
+margin-top:6px;
+}
+.pb-actions{ display:flex; gap:8px; }
+.pb-mini{
+padding:8px 10px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.18);
+color:var(--fg);
+cursor:pointer;
+font:inherit;
+}
+
+.pb-log{
+flex:1;
+padding:12px;
+overflow:auto;
+-webkit-overflow-scrolling:touch;
+}
+.pb-msg{ display:flex; margin:10px 0; }
+.pb-msg.me{ justify-content:flex-end; }
+.pb-bubble{
+max-width: 78%;
+padding:10px 12px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.22);
+color:var(--fg);
+line-height:1.55;
+font-size:13px;
+white-space:pre-wrap;
+}
+.pb-msg.me .pb-bubble{
+background: rgba(102,255,204,.14);
+border-color: rgba(102,255,204,.22);
+}
+.pb-meta{
+font-size:11px;
+color: rgba(255,255,255,.55);
+margin-top:6px;
+}
+
+.pb-foot{
+border-top:1px solid rgba(255,255,255,.10);
+padding:10px;
+display:flex; gap:8px; align-items:center;
+background: rgba(0,0,0,.18);
+}
+.pb-input{
+flex:1;
+border-radius:12px;
+border:1px solid rgba(255,255,255,.14);
+background: rgba(0,0,0,.22);
+color:var(--fg);
+padding:12px 12px;
+outline:none;
+font:inherit;
+}
+.pb-send{
+border-radius:12px;
+padding:12px 14px;
+border:1px solid rgba(255,255,255,.14);
+background: linear-gradient(135deg, rgba(102,255,204,.22), rgba(134,168,255,.16));
+color:var(--fg);
+cursor:pointer;
+font:inherit;
+}
+
+.pb-quick{
+display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;
+}
+.pb-chip{
+font-size:12px;
+padding:8px 10px;
+border-radius:999px;
+border:1px solid rgba(255,255,255,.12);
+background: rgba(0,0,0,.18);
+color:var(--muted);
+cursor:pointer;
+}
+</style>
+
+<div class="pb-fab" id="pbFab" aria-label="Open PEACE-BOT">💬</div>
+
+<div class="pb-modal" id="pbModal" aria-hidden="true">
+<div class="pb-chat" role="dialog" aria-modal="true" aria-label="PEACE-BOT chat">
+<div class="pb-head">
+<div>
+<div class="pb-title">PEACE-BOT</div>
+<div class="pb-sub">
+บอทจำลองสไตล์ “PEACE” เพื่อคุยเล่นกับ Cartoon 💛
+<div class="pb-badge">ไม่ใช่แชทจริงของ PEACE</div>
+</div>
+</div>
+<div class="pb-actions">
+<button class="pb-mini" id="pbReset">ล้าง</button>
+<button class="pb-mini" id="pbClose">ปิด</button>
+</div>
+</div>
+
+<div class="pb-log" id="pbLog"></div>
+
+<div style="padding:0 12px 10px 12px;">
+<div class="pb-quick" id="pbQuick"></div>
+</div>
+
+<div class="pb-foot">
+<input class="pb-input" id="pbInput" placeholder="พิมพ์คุยกับ PEACE-BOT..." autocomplete="off" />
+<button class="pb-send" id="pbSend">ส่ง</button>
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+// ===== บุคลิกตามที่คุณให้มา =====
+const PB = {
+botName: "PEACE-BOT",
+userName: "Cartoon",
+creatorName: "PEACE",
+phrases: ["ง้วยยยย", "ดวกกกก", "อวบอ้วนอุสตัน", "เอ้า ดวกทวง"],
+quickChips: [
+"สุดหล่อ",
+"พีส",
+"ดวก",
+"คิดถึงไหม",
+"เธอคือดอกไม้ที่สวยสดงดงาม"
+],
+memory: {
+coupleDateTH: "18/12/2565",
+flowerColorAnswer: "ทอง"
+}
+};
+
+const q = (id)=>document.getElementById(id);
+const fab = q("pbFab");
+const modal = q("pbModal");
+const log = q("pbLog");
+const input = q("pbInput");
+const send = q("pbSend");
+const close = q("pbClose");
+const reset = q("pbReset");
+const quick = q("pbQuick");
+
+const pad2 = (n)=> String(n).padStart(2,"0");
+function nowTime(){
+const d=new Date();
+return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+function addMsg(text, who="bot"){
+const wrap = document.createElement("div");
+wrap.className = "pb-msg" + (who==="me" ? " me":"");
+
+const bubble = document.createElement("div");
+bubble.className="pb-bubble";
+bubble.textContent = text;
+
+const meta = document.createElement("div");
+meta.className="pb-meta";
+meta.textContent = (who==="me" ? PB.userName : PB.botName) + " • " + nowTime();
+
+bubble.appendChild(meta);
+wrap.appendChild(bubble);
+log.appendChild(wrap);
+
+log.scrollTop = log.scrollHeight;
+}
+
+function addBot(text){
+const salt = PB.phrases[Math.floor(Math.random()*PB.phrases.length)];
+addMsg(text.replace(/\{salt\}/g, salt), "bot");
+}
+
+function normalize(s){ return (s||"").trim(); }
+function lower(s){ return normalize(s).toLowerCase(); }
+
+function makeDateTH(ddmmyyyy){
+const [dd,mm,yyyy]=ddmmyyyy.split("/").map(Number);
+const y = yyyy - 543;
+return new Date(y, mm-1, dd, 0,0,0,0);
+}
+function coupleSince(){
+const start = makeDateTH(PB.memory.coupleDateTH);
+const now = new Date();
+let ms = now - start;
+if(ms < 0) ms = 0;
+const sec = Math.floor(ms/1000);
+const min = Math.floor(sec/60);
+const hr = Math.floor(min/60);
+const day = Math.floor(hr/24);
+return {day, hr: hr%24, min: min%60};
+}
+
+function reply(text){
+const raw = normalize(text);
+const t = lower(text);
+
+if(t === "/help") return `คำสั่ง: /help /clear /about`;
+if(t === "/about") return `PEACE-BOT (บอทจำลอง) ของ ${PB.creatorName} สำหรับ ${PB.userName} 💛`;
+if(t === "/clear") return "__CLEAR__";
+
+// เรียก "สุดหล่อ" -> ต้องขึ้น "ง้วยยยยย เขิน"
+if(t.includes("สุดหล่อ")){
+return `ง้วยยยยย เขิน 😳`;
+}
+// เรียก "ดวก" (เรียกคุณ) -> ต้องขึ้น "เอ้า ดวกทวง"
+if(t === "ดวก" || t.includes(" ดวก") || t.startsWith("ดวก")){
+return `เอ้า ดวกทวง 😌`;
+}
+// เรียก "พีส"
+if(t === "พีส" || t.includes("พีส")){
+return `ว่าไงอ้วน 😏`;
+}
+
+// inside joke: ดอกไม้ + สีทอง
+if(t.includes("เธอคือดอกไม้ที่สวยสดงดงาม")){
+return `แล้วสีไรล่ะ 😌`;
+}
+if(t === "สี" || t === "สี?" || t.includes("สีอะไร") || t.includes("สีไร")){
+return `${PB.memory.flowerColorAnswer}`;
+}
+
+if(t.includes("คิดถึง") || t.includes("miss")){
+return `คิดถึงดิ อวบอ้วนอุสตัน 💛`;
+}
+if(t.includes("รัก") || t.includes("บอกรัก")){
+return `รักดิ ง้วยยยย 😌`;
+}
+if(t.includes("วันคบ") || t.includes("คบกัน") || t.includes("ครบรอบ")){
+const {day, hr, min} = coupleSince();
+return `คบมาแล้ว ${day} วัน ${hr} ชม. ${min} นาที 😏`;
+}
+if(t.includes("หิว")){
+return `ไปกินไรดีอ้วน 🍽️`;
+}
+if(t.includes("งอน")){
+return `อย่าพึ่งงอนดิ ดวกกกก 😏`;
+}
+if(t.includes("เหนื่อย") || t.includes("ท้อ") || t.includes("เครียด")){
+return `พักก่อนอ้วน เดี๋ยวเค้าดูแล 😌`;
+}
+
+const fb = [
+`หืม ว่าไงนะอ้วน 😏`,
+`ดวกกกก พิมพ์ใหม่อีกรอบดิ`,
+`ง้วยยยย เขินละนะ`,
+`อวบอ้วนอุสตัน 😌`
+];
+return fb[Math.floor(Math.random()*fb.length)];
+}
+
+function openChat(){
+modal.classList.add("open");
+modal.setAttribute("aria-hidden","false");
+setTimeout(()=>input.focus(), 50);
+if(!log.dataset.inited){
+log.dataset.inited="1";
+addBot(`สวัสดี {salt} ว่าไงอ้วน 😏`);
+addBot(`พิมพ์มาเลย หรือกดปุ่มลัดก็ได้`);
+}
+}
+function closeChat(){
+modal.classList.remove("open");
+modal.setAttribute("aria-hidden","true");
+}
+
+function sendMsg(){
+const text = normalize(input.value);
+if(!text) return;
+addMsg(text, "me");
+input.value = "";
+
+const r = reply(text);
+if(r === "__CLEAR__"){
+log.innerHTML = "";
+log.dataset.inited = "";
+addBot(`ล้างแล้ว {salt}`);
+return;
+}
+const delay = 220 + Math.random()*300;
+setTimeout(()=>addBot(r), delay);
+}
+
+function buildChips(){
+quick.innerHTML = "";
+PB.quickChips.forEach(ch=>{
+const b = document.createElement("button");
+b.className="pb-chip";
+b.type="button";
+b.textContent = ch;
+b.addEventListener("click", ()=>{
+input.value = ch;
+sendMsg();
+});
+quick.appendChild(b);
+});
+}
+buildChips();
+
+fab.addEventListener("click", openChat);
+close.addEventListener("click", closeChat);
+modal.addEventListener("click", (e)=>{ if(e.target===modal) closeChat(); });
+send.addEventListener("click", sendMsg);
+input.addEventListener("keydown", (e)=>{ if(e.key==="Enter") sendMsg(); });
+reset.addEventListener("click", ()=>{
+log.innerHTML = "";
+log.dataset.inited = "";
+addBot(`ล้างแชทแล้ว {salt}`);
+});
 })();
 </script>
+
 </body>
 </html>
